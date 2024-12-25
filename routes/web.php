@@ -20,8 +20,8 @@ Route::get('/checkout', [FrontendController::class, 'checkout']);
 Route::get('/contact', [FrontendController::class, 'contact']);
 Route::get('/product', [FrontendController::class, 'product']);
 Route::post('/contact-store', [FrontendController::class, 'contactStore'])->name('contact.store');
-Route::get('/customize-prod', [FrontendController::class, 'customizeProd']);
-Route::get('/prod-detail/{id}', [FrontendController::class, 'prodDetail'])->name('prod.detail');
+Route::get('/customize-prod/{id}', [FrontendController::class, 'customizeProd'])->name('customize.prod');
+// Route::get('/prod-detail/{id}', [FrontendController::class, 'prodDetail'])->name('prod.detail');
 
 Route::post('/carts/{id}', [CartController::class, 'index'])->name('carts.store');
 Route::delete('/carts/{id}', [CartController::class, 'destroy'])->name('carts.destroy');

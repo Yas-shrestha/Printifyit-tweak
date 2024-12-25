@@ -1,62 +1,44 @@
 @extends('backend.layouts.main')
 @section('container')
     <style>
-        .selected-items {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            min-height: 40px;
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+        #size-options {
+            gap: 12px;
         }
 
-        .selected-item {
+        .size-option {
+            position: relative;
+        }
+
+        .size-option input[type="checkbox"] {
+            display: none;
+            /* Hide default checkbox */
+        }
+
+        .size-option .size-label {
+            display: inline-block;
+            padding: 8px 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .size-option .size-label:hover {
+            border-color: #007bff;
+            background-color: #e9ecef;
+        }
+
+        .size-option input[type="checkbox"]:checked+.size-label {
+            border-color: #007bff;
             background-color: #007bff;
             color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .add-button {
-            padding: 10px;
-            background-color: #696cff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .dropdown-container {
-            border: 1px solid #ccc;
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: white;
-            border-radius: 5px;
-            position: absolute;
-            z-index: 10;
-            margin-top: 5px;
-        }
-
-        .dropdown-container ul {
-            list-style: none;
-            margin: 0;
-            padding: 0
-        }
-
-        .dropdown-list li {
-            padding: 8px 2rem;
-            cursor: pointer;
-
-        }
-
-        .dropdown-list li:hover {
-            background-color: #e2e6ea;
         }
     </style>
+
     <main id="main" class="main">
         @if (Session::has('message'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -85,10 +67,12 @@
                             <li class="breadcrumb-item active">Add-product</li>
                         </ol>
                     </nav>
-                    <div class="alert alert-warning text-center" role="alert">
-                        Create Your own product :D
-                    </div>
+
                 </div><!-- End Page Title -->
+
+                <div class="bg-warning p-3 rounded-3 my-3 text-white">You can also insert only 1 images just insert it on
+                    front_img
+                </div>
                 <section class="section">
                     <div class="row">
                         <div class="card">
@@ -107,59 +91,133 @@
                                                 @enderror
                                             </div>
                                         </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="exampleInputText1" class="form-label">price</label>
+                                                <input type="number" class="form-control" id="exampleInputText1"
+                                                    aria-describedby="textHelp" name="price">
+                                                @error('price')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="color-form" class="form-label">Choose Colors</label>
+                                                <div id="color-inputs-container">
+                                                    <div class="color-input-wrapper"
+                                                        style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                                        <input type="color" class="form-control color-picker"
+                                                            name="colors[]" value="#000000" style="width: 60px;">
+                                                        <input type="text" class="form-control hex-input" name="colors[]"
+                                                            placeholder="#000000" value="#000000" maxlength="7"
+                                                            style="width: 100px;">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-primary add-color-btn">Add</button>
+                                                    </div>
+                                                </div>
+                                                <div id="color-preview-container"
+                                                    style="margin-top: 15px; display: flex; gap: 10px;"></div>
+                                                @error('colors')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+
 
                                         <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <label for="Categories">Categories</label>
-                                            <div id="selected-items" class="selected-items">
-                                                <!-- Selected items will appear here -->
-                                            </div>
-
-                                            <button type="button" id="add-button" class="add-button">Add
-                                                Categories</button>
-
-                                            <div id="dropdown-container" class="dropdown-container" style="display: none;">
-                                                <ul id="dropdown-list" class="dropdown-list">
-                                                    <li data-name="">-select-</li>
-                                                    @foreach ($categories as $category)
-                                                        <li data-name="{{ $category->name }}">{{ $category->name }}</li>
+                                            <div class="mb-3">
+                                                <label for="size-options" class="form-label">Sizes</label>
+                                                <div id="size-options" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                                    @foreach (['XS', 'S', 'M', 'L', 'XL', 'XXL'] as $size)
+                                                        <div class="size-option">
+                                                            <input type="checkbox" id="size-{{ strtolower($size) }}"
+                                                                name="size[]" value="{{ $size }}"
+                                                                {{ in_array($size, $selectedSizes ?? []) ? 'checked' : '' }}>
+                                                            <label for="size-{{ strtolower($size) }}"
+                                                                class="size-label">{{ $size }}</label>
+                                                        </div>
                                                     @endforeach
-                                                </ul>
-                                            </div>
-
-                                            <input type="hidden" name="selected_categories" id="selected-categories">
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <div class="mb-3">
-                                                <label for="exampleInputText1" class="form-label">Color</label>
-                                                <input type="color" class="form-control" id="exampleInputText1"
-                                                    aria-describedby="textHelp" name="color">
-                                                @error('color')
-                                                    <small>{{ $message }}</small>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-
-                                        <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <div class="mb-3">
-                                                <label for="exampleInputText1" class="form-label">size</label>
-                                                <select name="size" id="sizes" class="form-select"
-                                                    aria-label="Default select example">
-                                                    <option value="" selected>-Select-</option>
-                                                    <option value="S">Small</option>
-                                                    <option value="M">Medium</option>
-                                                    <option value="L">Large</option>
-                                                    <option value="XL">Extra Large</option>
-                                                    <option value="XXL">XXL</option>
-                                                </select>
-
+                                                </div>
+                                                <small>Click to choose sizes.</small>
                                                 @error('size')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="stock-form" class="form-label">Stock</label>
+                                                <input type="number" class="form-control" id="stock-form"
+                                                    aria-describedby="textHelp" name="stock" min="0"
+                                                    max="50000">
+                                                @error('stock')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="exampleInputText1" class="form-label">Front Img</label>
+
+                                                <input class="form-control" type="file" id="formFile"
+                                                    name="front_img">
+
+                                                @error('front_img')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="exampleInputText1" class="form-label">Back Img</label>
+
+                                                <input class="form-control" type="file" id="formFile"
+                                                    name="back_img">
+
+                                                @error('back_img')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="exampleInputText1" class="form-label">Left Img</label>
+
+                                                <input class="form-control" type="file" id="formFile"
+                                                    name="left_img">
+
+                                                @error('left_img')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="exampleInputText1" class="form-label">Right Img</label>
+
+                                                <input class="form-control" type="file" id="formFile"
+                                                    name="right_img">
+
+                                                @error('right_img')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="mb-3">
+                                                <label for="exampleInputText1" class="form-label">description</label>
+                                                <textarea id="myEditor" name="description"></textarea>
+                                                @error('description')
                                                     <small>{{ $message }}</small>
                                                 @enderror
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
+
+                                        {{-- <div class="col-lg-12 col-md-12 col-sm-12">
                                             <label for="myEditor">Suggestions</label>
                                             <div class="alert alert-primary alert-dismissible fade show" role="alert">
                                                 Please give every detail you want and be as much specific as you can for
@@ -169,8 +227,7 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="alert"
                                                     aria-label="Close"></button>
                                             </div>
-                                            <textarea id="myEditor" name="suggestion"></textarea>
-                                        </div>
+                                        </div> --}}
                                     </div>
                                     <button type="submit" class="btn btn-primary my-3" name="submit">Submit</button>
                                 </form>
@@ -183,6 +240,85 @@
 
     </main>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorInputsContainer = document.getElementById('color-inputs-container');
+            const colorPreviewContainer = document.getElementById('color-preview-container');
+
+            // Add a new color input
+            function addColorInput() {
+                const colorWrapper = document.createElement('div');
+                colorWrapper.classList.add('color-input-wrapper');
+                colorWrapper.style.marginBottom = '10px';
+                colorWrapper.style.display = 'flex';
+                colorWrapper.style.alignItems = 'center';
+                colorWrapper.style.gap = '10px';
+
+                colorWrapper.innerHTML = `
+                    <input type="color" class="form-control color-picker" name="colors[]" value="#000000" style="width: 60px;">
+                    <input type="text" class="form-control hex-input" name="colors[]" placeholder="#000000" value="#000000" maxlength="7" style="width: 100px;">
+                    <button type="button" class="btn btn-sm btn-primary add-color-btn" style="display: none;">Add</button>
+                    <button type="button" class="btn btn-sm btn-danger remove-color-btn">Remove</button>
+                `;
+
+                colorInputsContainer.appendChild(colorWrapper);
+                syncColorPickerWithHexInput(colorWrapper);
+                updateColorPreviews();
+            }
+
+            // Update the preview container
+            function updateColorPreviews() {
+                colorPreviewContainer.innerHTML = '';
+                const colorPickers = document.querySelectorAll('.color-picker');
+                colorPickers.forEach(colorPicker => {
+                    const colorBlock = document.createElement('div');
+                    colorBlock.style.width = '50px';
+                    colorBlock.style.height = '50px';
+                    colorBlock.style.backgroundColor = colorPicker.value;
+                    colorBlock.style.border = '1px solid #000';
+                    colorPreviewContainer.appendChild(colorBlock);
+
+                    colorPicker.addEventListener('input', () => {
+                        colorBlock.style.backgroundColor = colorPicker.value;
+                    });
+                });
+            }
+
+            // Sync color picker and hex input
+            function syncColorPickerWithHexInput(wrapper) {
+                const colorPicker = wrapper.querySelector('.color-picker');
+                const hexInput = wrapper.querySelector('.hex-input');
+
+                colorPicker.addEventListener('input', () => {
+                    hexInput.value = colorPicker.value;
+                    updateColorPreviews();
+                });
+
+                hexInput.addEventListener('input', () => {
+                    const hexValue = hexInput.value;
+                    if (/^#([0-9A-Fa-f]{6})$/.test(hexValue)) {
+                        colorPicker.value = hexValue;
+                        updateColorPreviews();
+                    }
+                });
+            }
+
+            // Add event listeners for adding/removing colors
+            colorInputsContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('add-color-btn')) {
+                    addColorInput();
+                } else if (event.target.classList.contains('remove-color-btn')) {
+                    event.target.parentElement.remove();
+                    updateColorPreviews();
+                }
+            });
+
+            // Initialize the first color picker and hex input sync
+            const initialColorWrapper = document.querySelector('.color-input-wrapper');
+            syncColorPickerWithHexInput(initialColorWrapper);
+            updateColorPreviews();
+        });
+    </script>
+    <script>
         tinymce.init({
             selector: '#myEditor', // Target the specific textarea
             plugins: [
@@ -192,7 +328,7 @@
                 'emoticons', 'charmap', 'searchreplace', 'visualblocks'
 
             ],
-            toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | link image  | numlist bullist  ',
+            toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | numlist bullist  ',
             menubar: false, // Simplify UI by removing menu bar
             branding: false, // Remove "Powered by TinyMCE" branding
             height: 400, // Set a comfortable height for the editor
@@ -224,6 +360,71 @@
         });
     </script>
 
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sizeInputsContainer = document.getElementById('size-inputs-container');
+            const sizePreviewContainer = document.getElementById('size-preview-container');
+
+            // Add a new size input
+            function addSizeInput() {
+                const sizeWrapper = document.createElement('div');
+                sizeWrapper.classList.add('size-input-wrapper');
+                sizeWrapper.style.marginBottom = '10px';
+                sizeWrapper.style.display = 'flex';
+                sizeWrapper.style.alignItems = 'center';
+                sizeWrapper.style.gap = '10px';
+
+                sizeWrapper.innerHTML = `
+                <input type="text" class="form-control size-input" name="size[]" placeholder="Enter size (e.g., S, M, L)" style="width: 200px;">
+                <button type="button" class="btn btn-sm btn-danger remove-size-btn">Remove</button>
+            `;
+
+                sizeInputsContainer.appendChild(sizeWrapper);
+                updateSizePreviews();
+            }
+
+            // Update the preview container
+            function updateSizePreviews() {
+                sizePreviewContainer.innerHTML = '';
+                const sizeInputs = document.querySelectorAll('.size-input');
+                sizeInputs.forEach(sizeInput => {
+                    if (sizeInput.value.trim() !== '') {
+                        const sizeBlock = document.createElement('div');
+                        sizeBlock.style.padding = '5px 10px';
+                        sizeBlock.style.border = '1px solid #000';
+                        sizeBlock.style.borderRadius = '5px';
+                        sizeBlock.style.backgroundColor = '#f1f1f1';
+                        sizeBlock.innerText = sizeInput.value.trim();
+                        sizePreviewContainer.appendChild(sizeBlock);
+
+                        sizeInput.addEventListener('input', () => {
+                            sizeBlock.innerText = sizeInput.value.trim();
+                        });
+                    }
+                });
+            }
+
+            // Add event listeners for adding/removing sizes
+            sizeInputsContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('add-size-btn')) {
+                    addSizeInput();
+                    updateSizePreviews();
+                } else if (event.target.classList.contains('remove-size-btn')) {
+                    event.target.parentElement.remove();
+                    updateSizePreviews();
+                }
+            });
+
+            // Initialize the first size preview
+            const initialSizeWrapper = document.querySelector('.size-input-wrapper .size-input');
+            if (initialSizeWrapper) {
+                initialSizeWrapper.addEventListener('input', updateSizePreviews);
+            }
+        });
+    </script>
+
     <script>
         function firstFunction() {
             var x = document.querySelector('input[name=img]:checked').value;
@@ -234,19 +435,6 @@
             dropdownContainer.style.display = dropdownContainer.style.display === 'none' ? 'block' : 'none';
         });
 
-        document.querySelectorAll('#dropdown-list li').forEach(function(item) {
-            item.addEventListener('click', function() {
-                const itemName = item.textContent.trim(); // Get the name of the category
-
-                // Add selected item to display area
-                if (itemName) {
-                    addItem(itemName);
-                }
-
-                // Hide the dropdown after selection
-                document.getElementById('dropdown-container').style.display = 'none';
-            });
-        });
 
         function addItem(name) {
             const selectedItemsContainer = document.getElementById('selected-items');

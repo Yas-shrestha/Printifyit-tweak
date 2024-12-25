@@ -1,67 +1,44 @@
 @extends('backend.layouts.main')
 @section('container')
     <style>
-        .selected-items {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin-bottom: 10px;
-            min-height: 40px;
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-            background-color: #f8f9fa;
-            border-radius: 5px;
+        #size-options {
+            gap: 12px;
         }
 
-        .selected-item {
+        .size-option {
+            position: relative;
+        }
+
+        .size-option input[type="checkbox"] {
+            display: none;
+            /* Hide default checkbox */
+        }
+
+        .size-option .size-label {
+            display: inline-block;
+            padding: 8px 16px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .size-option .size-label:hover {
+            border-color: #007bff;
+            background-color: #e9ecef;
+        }
+
+        .size-option input[type="checkbox"]:checked+.size-label {
+            border-color: #007bff;
             background-color: #007bff;
             color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .add-button {
-            padding: 10px;
-            background-color: #696cff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .dropdown-container {
-            border: 1px solid #ccc;
-            max-height: 200px;
-            overflow-y: auto;
-            background-color: white;
-            border-radius: 5px;
-            position: absolute;
-            z-index: 10;
-            margin-top: 5px;
-        }
-
-        .dropdown-container ul {
-            list-style: none;
-            margin: 0;
-            padding: 0
-        }
-
-        .dropdown-list li {
-            padding: 8px 2rem;
-            cursor: pointer;
-
-        }
-
-        .dropdown-list li:hover {
-            background-color: #e2e6ea;
-        }
-
-        .prd-suggest img {
-            height: 50px;
-            width: 50px;
         }
     </style>
+
     <main id="main" class="main">
         @if (Session::has('message'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -87,27 +64,29 @@
                     <nav>
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Home</a></li>
-                            <li class="breadcrumb-item active">Edit-product</li>
-
+                            <li class="breadcrumb-item active">Add-product</li>
                         </ol>
                     </nav>
+
                 </div><!-- End Page Title -->
+
+                <div class="bg-warning p-3 rounded-3 my-3 text-white">You can also insert only 1 images just insert it on
+                    front_img
+                </div>
                 <section class="section">
                     <div class="row">
                         <div class="card">
                             <div class="card-body">
-                                <form action="{{ route('product.update', $product->id) }}" method="POST"
+                                <form action="{{ route('product.store', $product->id) }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
-                                    @method('PUT')
                                     <div class="row">
 
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="mb-3">
                                                 <label for="exampleInputText1" class="form-label">name</label>
                                                 <input type="text" class="form-control" id="exampleInputText1"
-                                                    value="{{ $product->name }}" value="{{ $product->name }}"
-                                                    aria-describedby="textHelp" name="name">
+                                                    aria-describedby="textHelp" name="name" value="{{ $product->name }}">
                                                 @error('name')
                                                     <small>{{ $message }}</small>
                                                 @enderror
@@ -115,97 +94,186 @@
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="mb-3">
-                                                <label for="exampleInputText1" class="form-label">Color</label>
-                                                <input type="color" class="form-control" id="exampleInputText1"
-                                                    aria-describedby="textHelp" name="color"
-                                                    value="{{ $product->color }}">
-                                                @error('color')
+                                                <label for="exampleInputText1" class="form-label">price</label>
+                                                <input type="number" class="form-control" id="exampleInputText1"
+                                                    aria-describedby="textHelp" name="price"
+                                                    value="{{ $product->price }}">
+                                                @error('price')
                                                     <small>{{ $message }}</small>
                                                 @enderror
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <label for="Categories">Categories</label>
-                                            <div id="selected-items" class="selected-items">
-                                                <!-- Pre-fill selected categories -->
-                                                @foreach (explode(',', $product->category) as $category)
-                                                    <span class="selected-item" data-name="{{ $category }}">
-                                                        {{ $category }}
-                                                        <span class="remove-item"> ×</span>
-                                                        <!-- Remove button for backend categories -->
-                                                    </span>
-                                                @endforeach
-                                            </div>
-
-                                            <button type="button" id="add-button" class="add-button">Add
-                                                Categories</button>
-
-                                            <div id="dropdown-container" class="dropdown-container" style="display: none;">
-                                                <ul id="dropdown-list" class="dropdown-list">
-                                                    <li data-name="">-select-</li>
-                                                    @foreach ($categories as $category)
-                                                        <li data-name="{{ $category->name }}">{{ $category->name }}</li>
+                                            <div class="mb-3">
+                                                <label for="color-form" class="form-label">Choose Colors</label>
+                                                <div id="color-inputs-container">
+                                                    <!-- Check if $product->color is not null and decode it, else use an empty array -->
+                                                    @foreach (json_decode($product->color, true) ?? [] as $color)
+                                                        <div class="color-input-wrapper"
+                                                            style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                                            <input type="color" class="form-control color-picker"
+                                                                name="colors[]" value="{{ $color }}"
+                                                                style="width: 60px;">
+                                                            <input type="text" class="form-control hex-input"
+                                                                name="colors[]" value="{{ $color }}" maxlength="7"
+                                                                style="width: 100px;">
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-danger remove-color-btn">Remove</button>
+                                                        </div>
                                                     @endforeach
-                                                </ul>
-                                            </div>
-
-                                            <input type="hidden" name="selected_categories" id="selected-categories"
-                                                value="{{ $product->category }}">
-                                        </div>
-
-                                        @if (Auth::class && Auth::user()->role != 'user')
-                                            <div class="col-lg-6 col-md-6 col-sm-12">
-                                                <div class="mb-3">
-                                                    <label for="formFile" class="form-label">img</label>
-                                                    <input class="form-control" type="file" id="formFile"
-                                                        name="img">
                                                 </div>
+                                                <!-- Add new color input area -->
+                                                <div id="color-input-wrapper-template" style="display: none;">
+                                                    <div class="color-input-wrapper"
+                                                        style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                                                        <input type="color" class="form-control color-picker"
+                                                            name="colors[]" value="#000000" style="width: 60px;">
+                                                        <input type="text" class="form-control hex-input" name="colors[]"
+                                                            placeholder="#000000" maxlength="7" style="width: 100px;">
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-danger remove-color-btn">Remove</button>
+                                                    </div>
+                                                </div>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-primary add-color-btn">Add</button>
+                                                <div id="color-preview-container"
+                                                    style="margin-top: 15px; display: flex; gap: 10px;"></div>
+                                                @error('colors')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
                                             </div>
-                                        @endif
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="size-options" class="form-label">Sizes</label>
+                                                <div id="size-options" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                                    <!-- Check if $product->size is not null and decode it, else use an empty array -->
+                                                    @foreach (['XS', 'S', 'M', 'L', 'XL', 'XXL'] as $size)
+                                                        <div class="size-option">
+                                                            <input type="checkbox" id="size-{{ strtolower($size) }}"
+                                                                name="size[]" value="{{ $size }}"
+                                                                {{ in_array($size, json_decode($product->size, true) ?? []) ? 'checked' : '' }}>
+                                                            <label for="size-{{ strtolower($size) }}"
+                                                                class="size-label">{{ $size }}</label>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <small>Click to choose sizes.</small>
+                                                @error('size')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
 
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="mb-3">
-                                                <label for="exampleInputText1" class="form-label">size</label>
-                                                <select name="size" id="sizes" class="form-select"
-                                                    aria-label="Default select example">
-                                                    <option value="" selected>-Select-</option>
-                                                    <option value="S" {{ $product->size == 'S' ? 'selected' : '' }}>
-                                                        Small</option>
-                                                    <option value="M" {{ $product->size == 'M' ? 'selected' : '' }}>
-                                                        Medium</option>
-                                                    <option value="L" {{ $product->size == 'L' ? 'selected' : '' }}>
-                                                        Large</option>
-                                                    <option value="XL" {{ $product->size == 'XL' ? 'selected' : '' }}>
-                                                        Extra Large</option>
-                                                    <option value="XXL" {{ $product->size == 'XXL' ? 'selected' : '' }}>
-                                                        XXL</option>
-                                                </select>
-
-
-                                                @error('size')
+                                                <label for="stock-form" class="form-label">Stock</label>
+                                                <input type="number" class="form-control" id="stock-form"
+                                                    aria-describedby="textHelp" name="stock"
+                                                    value="{{ $product->stock }}">
+                                                @error('stock')
                                                     <small>{{ $message }}</small>
                                                 @enderror
                                             </div>
                                         </div>
-                                        <label for="myEditor">Suggestions</label>
-                                        <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                                            You can find your old suggestion below this suggestion box
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                aria-label="Close"></button>
-                                        </div>
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <textarea id="myEditor" name="suggestion"></textarea>
-                                            <div class="my-3 prd-suggest">
-                                                <h1 class="text-primary text-center">Your Suggestion </h1>
-                                                <div class="alert alert-warning alert-dismissible fade show"
-                                                    role="alert">
-                                                    Click-Img to view full screen
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"
-                                                        aria-label="Close"></button>
-                                                </div>
-                                                <div class="my-3 text-center">{!! $product->suggestion !!}</div>
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="front_img" class="form-label">Front Img</label>
+                                                <input class="form-control" type="file" id="front_img"
+                                                    name="front_img">
+
+                                                @if ($product->front_img)
+                                                    <div class="mt-2">
+                                                        <img src="{{ asset($product->front_img) }}" alt="Front Image"
+                                                            class="img-fluid" style="max-height: 200px;">
+                                                    </div>
+                                                @endif
+
+                                                @error('front_img')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
                                             </div>
                                         </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="back_img" class="form-label">Back Img</label>
+                                                <input class="form-control" type="file" id="back_img"
+                                                    name="back_img">
+
+                                                @if ($product->back_img)
+                                                    <div class="mt-2">
+                                                        <img src="{{ asset($product->back_img) }}" alt="Back Image"
+                                                            class="img-fluid" style="max-height: 200px;">
+                                                    </div>
+                                                @endif
+
+                                                @error('back_img')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="left_img" class="form-label">Left Img</label>
+                                                <input class="form-control" type="file" id="left_img"
+                                                    name="left_img">
+
+                                                @if ($product->left_img)
+                                                    <div class="mt-2">
+                                                        <img src="{{ asset($product->left_img) }}" alt="Left Image"
+                                                            class="img-fluid" style="max-height: 200px;">
+                                                    </div>
+                                                @endif
+
+                                                @error('left_img')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="mb-3">
+                                                <label for="right_img" class="form-label">Right Img</label>
+                                                <input class="form-control" type="file" id="right_img"
+                                                    name="right_img">
+
+                                                @if ($product->right_img)
+                                                    <div class="mt-2">
+                                                        <img src="{{ asset($product->right_img) }}" alt="Right Image"
+                                                            class="img-fluid" style="max-height: 200px;">
+                                                    </div>
+                                                @endif
+
+                                                @error('right_img')
+                                                    <small class="text-danger">{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="mb-3">
+                                                <label for="exampleInputText1" class="form-label">description</label>
+                                                <textarea id="myEditor" name="description"> {{ $product->description }}</textarea>
+                                                @error('description')
+                                                    <small>{{ $message }}</small>
+                                                @enderror
+                                            </div>
+                                        </div>
+
+
+                                        {{-- <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <label for="myEditor">Suggestions</label>
+                                            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                                Please give every detail you want and be as much specific as you can for
+                                                precise
+                                                design and also mention what product we are working on For ex:- Tshirt,Pant
+                                                etc
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                        </div> --}}
                                     </div>
                                     <button type="submit" class="btn btn-primary my-3" name="submit">Submit</button>
                                 </form>
@@ -218,6 +286,78 @@
 
     </main>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorInputsContainer = document.getElementById('color-inputs-container');
+            const colorPreviewContainer = document.getElementById('color-preview-container');
+            const addColorBtn = document.querySelector('.add-color-btn');
+            const colorInputTemplate = document.getElementById('color-input-wrapper-template');
+
+            // Add a new color input
+            function addColorInput() {
+                const colorWrapper = colorInputTemplate.firstElementChild.cloneNode(true);
+                colorInputsContainer.appendChild(colorWrapper);
+                syncColorPickerWithHexInput(colorWrapper);
+                updateColorPreviews();
+            }
+
+            // Remove color input
+            colorInputsContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-color-btn')) {
+                    event.target.parentElement.remove();
+                    updateColorPreviews();
+                }
+            });
+
+            // Update the preview container
+            function updateColorPreviews() {
+                colorPreviewContainer.innerHTML = '';
+                const colorPickers = document.querySelectorAll('.color-picker');
+                colorPickers.forEach(colorPicker => {
+                    const colorBlock = document.createElement('div');
+                    colorBlock.style.width = '50px';
+                    colorBlock.style.height = '50px';
+                    colorBlock.style.backgroundColor = colorPicker.value;
+                    colorBlock.style.border = '1px solid #000';
+                    colorPreviewContainer.appendChild(colorBlock);
+
+                    colorPicker.addEventListener('input', () => {
+                        colorBlock.style.backgroundColor = colorPicker.value;
+                    });
+                });
+            }
+
+            // Sync color picker and hex input
+            function syncColorPickerWithHexInput(wrapper) {
+                const colorPicker = wrapper.querySelector('.color-picker');
+                const hexInput = wrapper.querySelector('.hex-input');
+
+                colorPicker.addEventListener('input', () => {
+                    hexInput.value = colorPicker.value;
+                    updateColorPreviews();
+                });
+
+                hexInput.addEventListener('input', () => {
+                    const hexValue = hexInput.value;
+                    if (/^#([0-9A-Fa-f]{6})$/.test(hexValue)) {
+                        colorPicker.value = hexValue;
+                        updateColorPreviews();
+                    }
+                });
+            }
+
+            // Initialize the first color picker and hex input sync
+            const initialColorWrapper = document.querySelector('.color-input-wrapper');
+            syncColorPickerWithHexInput(initialColorWrapper);
+            updateColorPreviews();
+
+            // Add event listener for the Add Color button
+            addColorBtn.addEventListener('click', function() {
+                addColorInput();
+            });
+        });
+    </script>
+
+    <script>
         tinymce.init({
             selector: '#myEditor', // Target the specific textarea
             plugins: [
@@ -227,7 +367,7 @@
                 'emoticons', 'charmap', 'searchreplace', 'visualblocks'
 
             ],
-            toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | link image  | numlist bullist  ',
+            toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright | numlist bullist  ',
             menubar: false, // Simplify UI by removing menu bar
             branding: false, // Remove "Powered by TinyMCE" branding
             height: 400, // Set a comfortable height for the editor
@@ -259,6 +399,71 @@
         });
     </script>
 
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sizeInputsContainer = document.getElementById('size-inputs-container');
+            const sizePreviewContainer = document.getElementById('size-preview-container');
+
+            // Add a new size input
+            function addSizeInput() {
+                const sizeWrapper = document.createElement('div');
+                sizeWrapper.classList.add('size-input-wrapper');
+                sizeWrapper.style.marginBottom = '10px';
+                sizeWrapper.style.display = 'flex';
+                sizeWrapper.style.alignItems = 'center';
+                sizeWrapper.style.gap = '10px';
+
+                sizeWrapper.innerHTML = `
+                <input type="text" class="form-control size-input" name="size[]" placeholder="Enter size (e.g., S, M, L)" style="width: 200px;">
+                <button type="button" class="btn btn-sm btn-danger remove-size-btn">Remove</button>
+            `;
+
+                sizeInputsContainer.appendChild(sizeWrapper);
+                updateSizePreviews();
+            }
+
+            // Update the preview container
+            function updateSizePreviews() {
+                sizePreviewContainer.innerHTML = '';
+                const sizeInputs = document.querySelectorAll('.size-input');
+                sizeInputs.forEach(sizeInput => {
+                    if (sizeInput.value.trim() !== '') {
+                        const sizeBlock = document.createElement('div');
+                        sizeBlock.style.padding = '5px 10px';
+                        sizeBlock.style.border = '1px solid #000';
+                        sizeBlock.style.borderRadius = '5px';
+                        sizeBlock.style.backgroundColor = '#f1f1f1';
+                        sizeBlock.innerText = sizeInput.value.trim();
+                        sizePreviewContainer.appendChild(sizeBlock);
+
+                        sizeInput.addEventListener('input', () => {
+                            sizeBlock.innerText = sizeInput.value.trim();
+                        });
+                    }
+                });
+            }
+
+            // Add event listeners for adding/removing sizes
+            sizeInputsContainer.addEventListener('click', function(event) {
+                if (event.target.classList.contains('add-size-btn')) {
+                    addSizeInput();
+                    updateSizePreviews();
+                } else if (event.target.classList.contains('remove-size-btn')) {
+                    event.target.parentElement.remove();
+                    updateSizePreviews();
+                }
+            });
+
+            // Initialize the first size preview
+            const initialSizeWrapper = document.querySelector('.size-input-wrapper .size-input');
+            if (initialSizeWrapper) {
+                initialSizeWrapper.addEventListener('input', updateSizePreviews);
+            }
+        });
+    </script>
+
     <script>
         function firstFunction() {
             var x = document.querySelector('input[name=img]:checked').value;
@@ -269,26 +474,13 @@
             dropdownContainer.style.display = dropdownContainer.style.display === 'none' ? 'block' : 'none';
         });
 
-        document.querySelectorAll('#dropdown-list li').forEach(function(item) {
-            item.addEventListener('click', function() {
-                const itemName = item.textContent.trim(); // Get the name of the category
-
-                // Add selected item to display area
-                if (itemName) {
-                    addItem(itemName);
-                }
-
-                // Hide the dropdown after selection
-                document.getElementById('dropdown-container').style.display = 'none';
-            });
-        });
 
         function addItem(name) {
             const selectedItemsContainer = document.getElementById('selected-items');
             const existingItems = Array.from(selectedItemsContainer.querySelectorAll('.selected-item'));
 
             // Prevent duplicates by checking if the name already exists
-            if (existingItems.some(item => item.textContent.trim() === name)) {
+            if (existingItems.some(item => item.textContent === name)) {
                 return;
             }
 
@@ -299,51 +491,19 @@
             itemElement.textContent = name;
 
             // Add remove functionality on click
-            const removeButton = document.createElement('span');
-            removeButton.textContent = '×';
-            removeButton.classList.add('remove-item');
-            removeButton.addEventListener('click', function() {
+            itemElement.addEventListener('click', function() {
                 itemElement.remove();
                 updateHiddenInput();
             });
-
-            itemElement.appendChild(removeButton);
 
             selectedItemsContainer.appendChild(itemElement);
             updateHiddenInput();
         }
-
-        // Add remove functionality to the pre-existing categories loaded from the backend
-        document.querySelectorAll('.selected-item .remove-item').forEach(function(button) {
-            button.addEventListener('click', function() {
-                const itemElement = button.parentElement;
-                itemElement.remove();
-                updateHiddenInput();
-            });
-        });
 
         function updateHiddenInput() {
             const selectedNames = Array.from(document.querySelectorAll('.selected-item'))
                 .map(item => item.getAttribute('data-name')); // Get names, not IDs
             document.getElementById('selected-categories').value = selectedNames.join(','); // Join names with commas
         }
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Select all the images inside the suggestion content
-            const images = document.querySelectorAll('.prd-suggest img');
-
-            // Loop through each image and wrap it in a link
-            images.forEach(function(image) {
-                const imgSrc = image.getAttribute('src'); // Get the image source
-                const link = document.createElement('a'); // Create a new anchor tag
-                link.setAttribute('href', imgSrc); // Set the href to the image source
-                link.setAttribute('target', '_blank'); // Open in a new tab
-
-                // Wrap the image with the anchor tag
-                image.parentNode.insertBefore(link, image);
-                link.appendChild(image); // Append the image inside the link
-            });
-        });
     </script>
 @endsection

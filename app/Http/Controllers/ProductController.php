@@ -19,7 +19,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::query()->where('user_id', Auth::id())->paginate(10);
+        $products = Product::query()->paginate(10);
         return view('backend.product.index', compact('products'));
     }
 
@@ -37,68 +37,58 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request);
-        $product = new Product;
         $request->validate([
             'name' => 'required|string',
-            'img' => 'nullable|mimes:png,jpg,jpeg',
-            'category' => 'nullable',
-            'suggestion' => 'required',
-
+            'stock' => 'required|numeric',
+            'description' => 'required|string',
+            'colors' => 'required|array',
+            'colors.*' => 'string',
+            'size' => 'required|array', // Ensure at least one size is selected
+            'size.*' => 'in:XS,S,M,L,XL,XXL',
+            'price' => 'required|numeric',
+            'front_img' => 'required|file|image|mimes:jpeg,png,jpg|max:2048',
+            'back_img' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
+            'right_img' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
+            'left_img' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
         ]);
-        $user_id = Auth::user()->id;
-        $product->user_id = $user_id; // Assuming the Product model has a user_id column
+
+        $product = new Product;
         $product->name = $request->input('name');
-        $product->color = $request->input('color');
-        $product->size = $request->input('size');
-        $product->category = $request->input('selected_categories');
-        $suggestionContent = $request->input('suggestion');
+        $product->description = $request->input('description');
+        $product->price = $request->input('price');
+        $product->stock = $request->input('stock');
+        $product->color = json_encode($request->input('colors')); // Convert the array to JSON
+        $product->size = json_encode($request->input('size'));   // Convert the array to JSON
 
-        $dom = new \DOMDocument();
-        libxml_use_internal_errors(true); // Suppress errors due to malformed HTML
-        $dom->loadHTML($suggestionContent, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-        libxml_clear_errors();
-
-        // Process each image
-        $images = $dom->getElementsByTagName('img');
-        foreach ($images as $img) {
-            $src = $img->getAttribute('src');
-
-            // Check if the src is in base64 format
-            if (strpos($src, 'data:image') === 0) {
-                // Extract the base64 data
-                list($type, $data) = explode(';', $src);
-                list(, $data) = explode(',', $data);
-                $data = base64_decode($data);
-
-                // Define a unique filename and save the image
-                $imageName = uniqid() . '.png';
-                $path = public_path('suggestion_images/' . $imageName);
-                file_put_contents($path, $data);
-
-                // Replace the base64 src with the saved image URL
-                $img->setAttribute('src', asset('suggestion_images/' . $imageName));
-            }
+        if ($request->hasFile('front_img')) {
+            $file = $request->file('front_img');
+            $uniqueName = 'front_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->front_img = 'products/' . $uniqueName;
         }
 
-        // Save the modified suggestion content
-        $product->suggestion = $dom->saveHTML();
-
-        // Handle the optional image upload
-        if ($request->hasFile('img')) {
-            // Get the file from the request
-            $file = $request->file('img');
-
-            // Create a nice filename using the product name and extension
-            $imageName = Str::slug($product->name) . '-' . time() . '.' . $file->getClientOriginalExtension();
-
-            // Move the file to the public/uploads folder
-            $file->move(public_path('uploads'), $imageName);
-
-            // Save the image path in the database
-            $product->img_path = 'uploads/' . $imageName; // Save only the relative path in the database
+        if ($request->hasFile('back_img')) {
+            $file = $request->file('back_img');
+            $uniqueName = 'back_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->back_img = 'products/' . $uniqueName;
         }
-        // Save the product to the database
+
+        if ($request->hasFile('right_img')) {
+            $file = $request->file('right_img');
+            $uniqueName = 'right_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->right_img = 'products/' . $uniqueName;
+        }
+
+        if ($request->hasFile('left_img')) {
+            $file = $request->file('left_img');
+            $uniqueName = 'left_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->left_img = 'products/' . $uniqueName;
+        }
+
+
         $product->save();
 
         return redirect('/admin/product')->with('success', 'Product added successfully!');
@@ -130,128 +120,86 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
-
-        // Validate the input
         $request->validate([
             'name' => 'required|string',
-            'img' => 'nullable',
-
-            'suggestion' => 'nullable', // Allow suggestion to be null
+            'description' => 'required|string',
+            'color' => 'required|array',
+            'color.*' => 'string',
+            'size' => 'required|array',
+            'size.*' => 'string',
+            'price' => 'required|numeric',
+            'front_img' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
+            'back_img' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
+            'right_img' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
+            'left_img' => 'nullable|file|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Update the product fields
+        // Find the product by ID
+        $product = Product::findOrFail($id);
+
+        // Update basic fields
         $product->name = $request->input('name');
-        $product->color = $request->input('color');
-        $product->size = $request->input('size');
-        $product->category = $request->input('selected_categories');
+        $product->description = $request->input('description');
+        $product->price = $request->input('price');
+        $product->stock = $request->input('stock');
+        $product->color = json_encode($request->input('color')); // Convert the array to JSON
+        $product->size = json_encode($request->input('size'));   // Convert the array to JSON
 
-        // If the suggestion has been updated
-        if ($request->has('suggestion') && $request->input('suggestion') !== null) {
-            // Delete old images from the previous suggestion
-            $this->deleteOldImagesFromSuggestion($product->suggestion);
-
-            // New suggestion content
-            $suggestionContent = $request->input('suggestion');
-
-            $dom = new \DOMDocument();
-            libxml_use_internal_errors(true); // Suppress errors due to malformed HTML
-            $dom->loadHTML($suggestionContent, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-            libxml_clear_errors();
-
-            // Process each image in the suggestion content
-            $images = $dom->getElementsByTagName('img');
-            foreach ($images as $img) {
-                $src = $img->getAttribute('src');
-
-                // Check if the src is in base64 format
-                if (strpos($src, 'data:image') === 0) {
-                    // Extract the base64 data
-                    list($type, $data) = explode(';', $src);
-                    list(, $data) = explode(',', $data);
-                    $data = base64_decode($data);
-
-                    // Define a unique filename and save the image
-                    $imageName = uniqid() . '.png';
-                    $path = public_path('suggestion_images/' . $imageName);
-                    file_put_contents($path, $data);
-
-                    // Replace the base64 src with the saved image URL
-                    $img->setAttribute('src', asset('suggestion_images/' . $imageName));
-                } else {
-                    // Delete old image from suggestion if it exists and the src is not a base64 image
-                    $this->deleteOldImageFromSuggestion($src);
-                }
+        // Handle front image
+        if ($request->hasFile('front_img')) {
+            // Delete old image if exists
+            if ($product->front_img && file_exists(public_path($product->front_img))) {
+                unlink(public_path($product->front_img));
             }
 
-            // Save the modified suggestion content
-            $product->suggestion = $dom->saveHTML();
+            $file = $request->file('front_img');
+            $uniqueName = 'front_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->front_img = 'products/' . $uniqueName;
         }
 
-        // Handle the optional image upload (product image)
-        if ($request->hasFile('img')) {
-            // Get the file from the request
-            $file = $request->file('img');
-
-            // Create a nice filename using the product name and extension
-            $imageName = Str::slug($product->name) . '-' . time() . '.' . $file->getClientOriginalExtension();
-
-            // Move the file to the public/uploads folder
-            $file->move(public_path('uploads'), $imageName);
-
-            // Check if the product already has an existing image and delete it
-            if ($product->img) {
-                $existingImagePath = public_path($product->img);
-                if (file_exists($existingImagePath)) {
-                    unlink($existingImagePath);
-                }
+        // Handle back image
+        if ($request->hasFile('back_img')) {
+            if ($product->back_img && file_exists(public_path($product->back_img))) {
+                unlink(public_path($product->back_img));
             }
 
-            // Save the new image path in the database
-            $product->img = 'uploads/' . $imageName; // Save only the relative path in the database
+            $file = $request->file('back_img');
+            $uniqueName = 'back_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->back_img = 'products/' . $uniqueName;
         }
 
-        // Save the updated product to the database
+        // Handle right image
+        if ($request->hasFile('right_img')) {
+            if ($product->right_img && file_exists(public_path($product->right_img))) {
+                unlink(public_path($product->right_img));
+            }
+
+            $file = $request->file('right_img');
+            $uniqueName = 'right_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->right_img = 'products/' . $uniqueName;
+        }
+
+        // Handle left image
+        if ($request->hasFile('left_img')) {
+            if ($product->left_img && file_exists(public_path($product->left_img))) {
+                unlink(public_path($product->left_img));
+            }
+
+            $file = $request->file('left_img');
+            $uniqueName = 'left_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('products'), $uniqueName);
+            $product->left_img = 'products/' . $uniqueName;
+        }
+
+        // Save updated product
         $product->save();
 
         return redirect('/admin/product')->with('success', 'Product updated successfully!');
     }
 
-    protected function deleteOldImagesFromSuggestion($oldSuggestion)
-    {
-        // Use regex to find all image URLs in the old suggestion content
-        preg_match_all('/src="([^"]+)"/', $oldSuggestion, $matches);
-        $existingImageUrls = $matches[1]; // Array of existing image URLs
-
-        // Remove suggestion images from the filesystem
-        foreach ($existingImageUrls as $existingImageUrl) {
-            // Get the relative path by removing the base URL (asset URL)
-            $existingImagePath = str_replace(asset(''), '', $existingImageUrl); // Remove the asset URL part
-            $existingImagePath = public_path($existingImagePath); // Get the full path in the public folder
-
-            // Check if the image exists and delete it
-            if (file_exists($existingImagePath)) {
-                unlink($existingImagePath); // Delete the suggestion image file
-            }
-        }
-    }
-
-    protected function deleteOldImageFromSuggestion($src)
-    {
-        // Strip out the base URL to get the relative image path
-        $relativePath = str_replace(asset('suggestion_images/'), '', $src);
-
-        // Ensure it's a valid relative path
-        if (!empty($relativePath)) {
-            // Get the full path to the image inside the public folder
-            $imagePath = public_path('suggestion_images/' . $relativePath);
-
-            // Check if the image exists and delete it
-            if (file_exists($imagePath)) {
-                unlink($imagePath); // Delete the file
-            }
-        }
-    }
 
     /**
      * Remove the specified resource from storage.

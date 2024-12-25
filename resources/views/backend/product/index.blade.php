@@ -41,8 +41,6 @@
                                                 <th scope="col">S.N</th>
                                                 <th scope="col">Name</th>
                                                 <th scope="col">Img</th>
-                                                <th scope="col">Request Status</th>
-                                                <th scope="col">Status</th>
                                                 <th scope="col">Price Per Item</th>
                                                 <th scope="col">Action</th>
                                             </tr>
@@ -54,18 +52,14 @@
                                                     <th scope="row">{{ $loop->iteration }}</th>
                                                     <td>{{ $product->name }}</td>
                                                     <td>
-                                                        @if ($product->img != '')
-                                                            <a href="{{ asset($product->img) }}" target="_blank"
-                                                                alt ="not set"><img src="{{ asset($product->img) }}"
-                                                                    alt="" height="50px" width="50px"></a>
-                                                        @elseif ($product->req_status != 'accepted')
-                                                            <p>Not accepted</p>
-                                                        @else
-                                                            <p>under-production</p>
-                                                        @endif
+                                                        <a href="{{ asset($product->front_img) }}" target="_blank"
+                                                            alt="not set">
+                                                            <img src="{{ asset($product->front_img) }}" alt="not set"
+                                                                height="50px" width="50px">
+                                                        </a>
                                                     </td>
 
-                                                    @if (Auth::user() && Auth::user()->role == 'user')
+                                                    {{-- @if (Auth::user() && Auth::user()->role == 'user')
                                                         <td>
                                                             <span
                                                                 class="badge rounded-pill 
@@ -99,9 +93,8 @@
                                                                     class="btn btn-sm btn-primary my-1">Change</button>
                                                             </form>
                                                         </td>
-                                                    @endif
-                                                    @if ($product->req_status == 'accepted')
-                                                        @if (Auth::user() && Auth::user()->role == 'user')
+                                                    @endif --}}
+                                                    {{-- @if (Auth::user() && Auth::user()->role == 'user')
                                                             <td>
                                                                 <span
                                                                     class="badge rounded-pill 
@@ -134,71 +127,66 @@
                                                                         class="btn btn-sm btn-primary my-1">Change</button>
                                                                 </form>
                                                             </td>
-                                                        @endif
-                                                        <td id="price">
-                                                            Rs {{ $product->price }}
+                                                        @endif --}}
 
-                                                            <!-- Button trigger modal -->
-                                                            @if (Auth()->user() && Auth()->user()->role != 'user')
-                                                                <button type="button" class="btn btn-primary btn-sm"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#editPrice{{ $product->id }}">
-                                                                    {{ $product->price ? 'Edit' : 'Add' }} Price
-                                                                </button>
+                                                    <td id="price">
+                                                        Rs {{ $product->price }}
 
-                                                                <!-- Modal -->
-                                                                <div class="modal fade" id="editPrice{{ $product->id }}"
-                                                                    tabindex="-1" aria-labelledby="exampleModalLabel"
-                                                                    aria-hidden="true">
-                                                                    <div
-                                                                        class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md">
-                                                                        <div class="modal-content">
-                                                                            <div class="modal-header">
-                                                                                <h5 class="modal-title"
-                                                                                    id="exampleModalLabel">
-                                                                                    Edit
-                                                                                    Price</h5>
-                                                                                <button type="button" class="btn-close"
-                                                                                    data-bs-dismiss="modal"
-                                                                                    aria-label="Close"></button>
-                                                                            </div>
-                                                                            <form
-                                                                                action="{{ route('update.price', $product->id) }}"
-                                                                                method="POST">
-                                                                                @csrf
-                                                                                <div class="modal-body">
-                                                                                    <div class="d-flex align-items-center">
-                                                                                        <label
-                                                                                            for="addPrice{{ $product->id }}"
-                                                                                            class="me-2">Price</label>
-                                                                                        <input type="number" name="price"
-                                                                                            id="addPrice{{ $product->id }}"
-                                                                                            min="1"
-                                                                                            class="form-control flex-grow-1"
-                                                                                            value="{{ $product->price }}"
-                                                                                            required>
-                                                                                    </div>
+                                                        <!-- Button trigger modal -->
+                                                        @if (Auth()->user() && Auth()->user()->role != 'user')
+                                                            <button type="button" class="btn btn-primary btn-sm"
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editPrice{{ $product->id }}">
+                                                                {{ $product->price ? 'Edit' : 'Add' }} Price
+                                                            </button>
 
-                                                                                </div>
-                                                                                <div class="modal-footer">
-                                                                                    <button type="button"
-                                                                                        class="btn btn-secondary"
-                                                                                        data-bs-dismiss="modal">Close</button>
-                                                                                    <button type="submit"
-                                                                                        class="btn btn-primary">Save
-                                                                                        changes</button>
-                                                                                </div>
-                                                                            </form>
+                                                            <!-- Modal -->
+                                                            <div class="modal fade" id="editPrice{{ $product->id }}"
+                                                                tabindex="-1" aria-labelledby="exampleModalLabel"
+                                                                aria-hidden="true">
+                                                                <div
+                                                                    class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md">
+                                                                    <div class="modal-content">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                                Edit
+                                                                                Price </h5>
+                                                                            <button type="button" class="btn-close"
+                                                                                data-bs-dismiss="modal"
+                                                                                aria-label="Close"></button>
                                                                         </div>
+                                                                        <form
+                                                                            action="{{ route('update.price', $product->id) }}"
+                                                                            method="POST">
+                                                                            @csrf
+                                                                            <div class="modal-body">
+                                                                                <div class="d-flex align-items-center">
+                                                                                    <label
+                                                                                        for="addPrice{{ $product->id }}"
+                                                                                        class="me-2">Price</label>
+                                                                                    <input type="number" name="price"
+                                                                                        id="addPrice{{ $product->id }}"
+                                                                                        min="1"
+                                                                                        class="form-control flex-grow-1"
+                                                                                        value="{{ $product->price }}"
+                                                                                        required>
+                                                                                </div>
+
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button"
+                                                                                    class="btn btn-secondary"
+                                                                                    data-bs-dismiss="modal">Close</button>
+                                                                                <button type="submit"
+                                                                                    class="btn btn-primary">Save
+                                                                                    changes</button>
+                                                                            </div>
+                                                                        </form>
                                                                     </div>
                                                                 </div>
-                                                            @endif
-                                                        </td>
-                                                    @else
-                                                        <td></td>
-                                                        <td></td>
-                                                    @endif
-
+                                                            </div>
+                                                        @endif
+                                                    </td>
                                                     {{-- <td>{{ $product->category->name }}</td> --}}
                                                     <td>
                                                         <a href="{{ route('product.edit', $product->id) }}"
@@ -208,7 +196,7 @@
                                                             class="btn btn-md btn-secondary"><i class="fa fa-eye"
                                                                 aria-hidden="true"></i></a>
                                                         <!-- Modal trigger button -->
-                                                        @if ($product->user->id == Auth::id() || Auth::user()->role == 'admin')
+                                                        @if (Auth::user()->role == 'admin')
                                                             <button type="button" class="btn btn-danger btn-md"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#modalId{{ $product->id }}">

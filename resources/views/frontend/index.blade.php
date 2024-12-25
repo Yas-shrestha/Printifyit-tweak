@@ -102,7 +102,7 @@
         </div>
     </section>
 
-    <section id="clothing" class="my-5 overflow-hidden">
+    {{-- <section id="clothing" class="my-5 overflow-hidden">
         <div class="container pb-5">
             <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
                 <h2 class="display-3 fw-normal">Our Products</h2>
@@ -167,7 +167,7 @@
             </div>
             <!-- / products-carousel -->
         </div>
-    </section>
+    </section> --}}
 
     <section id="service">
         <div class="container py-5 my-5">
@@ -324,7 +324,7 @@
                 </div>
             </div>
 
-            <div class="swiper bestselling-swiper">
+            {{-- <div class="swiper bestselling-swiper">
                 <div class="swiper-wrapper">
                     @foreach ($newProducts as $product)
                         <div class="swiper-slide">
@@ -370,7 +370,7 @@
                     @endforeach
 
                 </div>
-            </div>
+            </div> --}}
             <!-- / category-carousel -->
         </div>
     </section>

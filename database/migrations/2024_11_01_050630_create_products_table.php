@@ -14,18 +14,15 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('img')->nullable();
-            $table->longText('suggestion')->nullable();
-            $table->string('color')->nullable();
-            $table->string('size');
-
-            $table->enum('req_status', ['accepted', 'rejected', 'pending'])->default('pending');
-            $table->string('category')->nullable();
-            $table->enum('product_status', ['pending', 'processing', 'finished'])->default('pending');
-            $table->foreignId('user_id')->nullable();
-            $table->foreignId('price')->nullable();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->enum('share_status', ['public', 'private'])->default('private');
+            $table->text('description');
+            $table->decimal('price', 10, 2);
+            $table->integer('stock')->default(0);
+            $table->string('front_img');
+            $table->string('back_img')->nullable();
+            $table->string('right_img')->nullable();
+            $table->string('left_img')->nullable();
+            $table->string('size'); // Size of the variant (e.g., S, M, L)
+            $table->string('color'); // Color of the variant (e.g., Red, Blue)
             $table->timestamps();
         });
     }

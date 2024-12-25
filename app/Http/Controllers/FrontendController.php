@@ -15,16 +15,16 @@ class FrontendController extends Controller
 
     public function index()
     {
-        $products = Product::query()->where('img', '!=', '')->where('price', '!=', '')->get()->all();
-        $newProducts = Product::query()
-            ->where('img', '!=', '')
-            ->where('price', '!=', '')
-            ->whereBetween('updated_at', [Carbon::now()->subDays(10), Carbon::now()])
-            ->get();
+        // $products = Product::query()->where('img', '!=', '')->where('price', '!=', '')->get()->all();
+        // $newProducts = Product::query()
+        //     ->where('img', '!=', '')
+        //     ->where('price', '!=', '')
+        //     ->whereBetween('updated_at', [Carbon::now()->subDays(10), Carbon::now()])
+        //     ->get();
         $carousels = Carousel::query()->limit(6)->get();
 
 
-        return view('frontend.index', compact('products', 'newProducts', 'carousels'));
+        return view('frontend.index', compact('carousels'));
     }
     public function shop()
     {
@@ -49,9 +49,10 @@ class FrontendController extends Controller
     {
         return view('frontend.product');
     }
-    public function customizeProd()
+    public function customizeProd($id)
     {
-        return view('frontend.customProd');
+        $product = Product::query()->where('id', $id)->get()->first();
+        return view('frontend.customProd', compact('product'));
     }
     public function contactStore(Request $request)
     {

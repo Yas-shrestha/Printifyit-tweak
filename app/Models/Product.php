@@ -6,11 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable = ['name', 'img', 'suggestion', 'color', 'size', 'product_status', 'user_id', 'share_status',  'req_status'];
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
+    protected $fillable = ['name', 'description', 'color', 'size', 'stock', 'right_img', 'left_img', 'front_img', 'back_img', 'price'];
 
     public function order()
     {
@@ -23,5 +19,13 @@ class Product extends Model
     public function cart()
     {
         return $this->hasMany(cart::class, 'product_id', 'id');
+    }
+    public function prod_detail()
+    {
+        return $this->hasMany(cart::class, 'product_id', 'id');
+    }
+    public function customizations()
+    {
+        return $this->hasMany(customizedProd::class, 'product_id', 'id');
     }
 }

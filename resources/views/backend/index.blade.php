@@ -1,7 +1,7 @@
 @extends('backend.layouts.main')
 @section('container')
     <!-- Content wrapper -->
-
+{{-- 
     <div class="container-xxl flex-grow-1 container-p-y">
         <div class="row">
             <div class="col-lg-6 col-md-12 col-6 mb-4">
@@ -22,8 +22,8 @@
 
                 </div>
             </div>
-        </div>
-        <div class="table">
+        </div> --}}
+        {{-- <div class="table">
             <h1 class="text-primary text-center mt-4">Your Orders</h1>
             @if (Auth::check() && Auth::user()->order)
                 <table class="table table-light table-striped table-hover table-bordered table-sm table-responsive-sm">
@@ -59,9 +59,9 @@
                 <p class="text-center">No orders found.</p>
             @endif
 
-        </div>
+        </div> --}}
 
-        <div class="products ">
+        {{-- <div class="products ">
             <h1 class="text-primary text-center mt-3"> Your Products</h1>
             <div class="row">
                 @php
@@ -102,11 +102,11 @@
                     $products = Auth::user()->product()->paginate(10); // Paginate 10 products per page
                 @endphp
             </div>
-        </div>
+        </div> --}}
     </div>
 
     <!-- / Content -->
-    <script>
+    {{-- <script>
         function increment(index) {
             let input = document.getElementById("quantity_" + index);
             input.value = parseInt(input.value) + 1;
@@ -118,5 +118,5 @@
                 input.value = parseInt(input.value) - 1;
             }
         }
-    </script>
+    </script> --}}
 @endsection

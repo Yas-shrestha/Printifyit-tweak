@@ -1,56 +1,461 @@
 @extends('layouts.frontend')
 @section('container')
-    <div class="container">
-        <div class="row">
-            <!-- Left Sidebar -->
-            <div class="col-md-2">
-                <button class="btn btn-outline-secondary">Products</button>
-                <button class="btn btn-outline-secondary">Designs</button>
-                <button class="btn btn-outline-secondary">Text</button>
-                <button class="btn btn-outline-secondary">Upload</button>
-            </div>
+    <style>
+        .customization-container {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
 
-            <!-- T-Shirt Preview -->
-            <div class="col-md-8 text-center">
-                <img id="tshirt-image" src="{{ asset('uploads/non-non-magni-nostru-1731923779.png') }}" class="img-fluid"
-                    alt="T-Shirt">
-                <div class="btn-group mt-2">
-                    <button class="btn btn-light" onclick="changeView('front')">Front</button>
-                    <button class="btn btn-light" onclick="changeView('back')">Back</button>
-                    <button class="btn btn-light" onclick="changeView('right')">Right</button>
-                    <button class="btn btn-light" onclick="changeView('left')">Left</button>
+        .preview-box {
+            position: relative;
+            /* border: 1px solid #ccc; */
+            /* border-radius: 5px; */
+            padding: 20px;
+            /* background-color: #f5f5f5; */
+        }
+
+        .preview-box img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .preview-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .preview-controls button {
+            border: none;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-controls button:hover {
+            background-color: #eee;
+        }
+
+        .tab-images img {
+            width: 60px;
+            height: auto;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .tab-images img.active {
+            border: 2px solid #007bff;
+        }
+
+        /* prod */
+        .position-relative {
+            position: relative;
+        }
+
+        #canvas-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: all;
+            z-index: 1;
+        }
+
+        .tshirt {
+            width: 100%;
+        }
+
+        .tab-images img {
+            width: 60px;
+            height: 80px;
+            cursor: pointer;
+        }
+
+        .tab-images img.active {
+            border: 2px solid #000;
+        }
+    </style>
+    <div class="container my-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="d-flex flex-column gap-4">
+                    <!-- Upload Button -->
+                    <button class="btn btn-light text-start" id="upload-btn">
+                        <i class="fas fa-upload me-2"></i> Upload
+                    </button>
+                    <hr>
+                    <button class="btn btn-light text-start" id="remove-btn"> <i class="fa fa-minus" aria-hidden="true"></i>
+                        Remove</button>
+                    <button class="btn btn-light text-start"><i class="fas fa-redo me-2"></i> Redo</button>
                 </div>
             </div>
 
-            <!-- Right Sidebar -->
-            <div class="col-md-2">
-                <h5>Men's Long Sleeve T-Shirt</h5>
-                <p>Delivery: Dec 30 - Jan 08</p>
-                <h6>Color:</h6>
-                <button class="color-option" style="background-color: navy;"></button>
-                <button class="color-option" style="background-color: red;"></button>
-                <!-- Add other colors -->
-                <button class="btn btn-success mt-3">Choose size & quantity</button>
+            <!-- Main Content -->
+            <div class="col-md-6">
+                <div class="preview-box text-center position-relative">
+                    <!-- Default product image -->
+                    <img src="{{ asset($product->front_img ?? 'https://via.placeholder.com/400x500') }}"
+                        alt="Product Preview" id="product-preview" class="img-fluid tshirt">
+
+                    <!-- Canvas Overlay -->
+                    <canvas id="canvas-overlay"></canvas>
+                </div>
+
+                <div class="mt-3 d-flex justify-content-center gap-3 tab-images">
+                    <img src="{{ asset($product->front_img ?? 'https://via.placeholder.com/60x80') }}" alt="Front"
+                        class="border active" data-view="front" id="front-view">
+                    <img src="{{ asset($product->back_img ?? ($product->front_img ?? 'https://via.placeholder.com/60x80')) }}"
+                        alt="Back" class="border" data-view="back" id="back-view">
+                    <img src="{{ asset($product->right_img ?? ($product->front_img ?? 'https://via.placeholder.com/60x80')) }}"
+                        alt="Right" class="border" data-view="right" id="right-view">
+                    <img src="{{ asset($product->left_img ?? ($product->front_img ?? 'https://via.placeholder.com/60x80')) }}"
+                        alt="Left" class="border" data-view="left" id="left-view">
+                </div>
+
+                <!-- Hidden File Input -->
+                <input type="file" id="image-upload" class="form-control" style="display: none;" accept="image/*">
+            </div>
+            <!-- Right Panel -->
+            <div class="col-md-3">
+                <h5 class="mb-3">{{ $product->name }}</h5>
+                <p>Delivery time: {{ $product->delivery_start }} - {{ $product->delivery_end }}</p>
+                <a href="#" class="text-primary">See product details</a>
+                <div class="mt-3">
+                    <h6>Product Color</h6>
+                    <div class="d-flex gap-2">
+                        @if (!empty($product->color))
+                            @php
+                                // Decode the JSON string into an array
+                                $colors = json_decode($product->color, true);
+                            @endphp
+
+                            @if (count($colors) > 0)
+                                <div class="d-flex gap-2">
+                                    @foreach ($colors as $color)
+                                        <div class="color-swatch"
+                                            style="background: {{ $color }}; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;"
+                                            data-color="{{ $color }}">
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p>No colors available for this product.</p>
+                            @endif
+                        @else
+                            <p>No colors available for this product.</p>
+                        @endif
+
+                    </div>
+
+                </div>
+                <div class="mt-3">
+                    <h6>Product Sizes</h6>
+                    <div class="d-flex gap-2">
+                        @if (!empty($product->size))
+                            @php
+                                // Decode the JSON string into an array for sizes
+                                $sizes = json_decode($product->size, true);
+                            @endphp
+
+                            @if (count($sizes) > 0)
+                                <div class="d-flex gap-2">
+                                    @foreach ($sizes as $size)
+                                        <div class="size-swatch"
+                                            style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;"
+                                            data-size="{{ $size }}">
+                                            {{ $size }}
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <p>No sizes available for this product.</p>
+                            @endif
+                        @else
+                            <p>No sizes available for this product.</p>
+                        @endif
+
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
+    <form id="product-form" method="POST" action="{{ route('product.save') }}">
+        @csrf
+        <input type="hidden" name="selected_color" id="selected-color">
+        <input type="hidden" name="selected_size" id="selected-size">
+        <input type="hidden" name="canvas_data" id="canvas-data">
+        <button type="submit" class="btn btn-primary mt-3">Save Customization</button>
+    </form>
     <script>
-        function changeView(view) {
-            const image = document.getElementById('tshirt-image');
-            switch (view) {
-                case 'front':
-                    image.src = 'path/to/front-view.png';
-                    break;
-                case 'back':
-                    image.src = 'path/to/back-view.png';
-                    break;
-                case 'right':
-                    image.src = 'path/to/right-view.png';
-                    break;
-                case 'left':
-                    image.src = 'path/to/left-view.png';
-                    break;
+        // Toggle preview tabs
+        document.querySelectorAll('.tab-images img').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelector('.tab-images img.active').classList.remove('active');
+                this.classList.add('active');
+                const view = this.getAttribute('alt').toLowerCase();
+                const previewImage = document.getElementById('product-preview');
+                previewImage.src = this.src; // Use the same source as the clicked thumbnail
+            });
+        });
+        // prod-view
+    </script>
+    <script>
+        const canvas = document.getElementById("canvas-overlay");
+        const ctx = canvas.getContext("2d");
+        const imageUpload = document.getElementById("image-upload");
+        const uploadBtn = document.getElementById("upload-btn");
+        const removeBtn = document.getElementById("remove-btn");
+        const viewTabs = document.querySelectorAll(".tab-images img");
+
+        const previewBox = document.querySelector(".preview-box");
+
+        // Set canvas dimensions
+        canvas.width = previewBox.offsetWidth;
+        canvas.height = previewBox.offsetHeight;
+
+        // State object for storing view-specific data
+        const views = {
+            front: {
+                image: null,
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            },
+            back: {
+                image: null,
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            },
+            right: {
+                image: null,
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            },
+            left: {
+                image: null,
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            },
+        };
+
+        let currentView = "front"; // Default view
+        let isDragging = false;
+        let isResizing = false;
+        let resizeHandleSize = 10;
+        let currentHandleIndex = null;
+
+        // Define red-marked area
+        const redBoxX = canvas.width * 0.2;
+        const redBoxY = canvas.height * 0.2;
+        const redBoxWidth = canvas.width * 0.6;
+        const redBoxHeight = canvas.height * 0.6;
+
+        // Function to draw the red-marked area
+        function drawBox() {
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 3;
+            ctx.strokeRect(redBoxX, redBoxY, redBoxWidth, redBoxHeight);
+        }
+
+        // Function to draw the image and handles
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBox();
+
+            const view = views[currentView];
+            if (view.image) {
+                ctx.drawImage(view.image, view.x, view.y, view.width, view.height);
+                drawHandles(view);
             }
         }
+
+        // Draw resize handles at each corner of the image
+        function drawHandles(view) {
+            const handles = getHandles(view);
+            ctx.fillStyle = "blue";
+            handles.forEach(({
+                x,
+                y
+            }) => {
+                ctx.fillRect(x - resizeHandleSize / 2, y - resizeHandleSize / 2, resizeHandleSize,
+                    resizeHandleSize);
+            });
+        }
+
+        // Get the positions of resize handles
+        function getHandles(view) {
+            return [{
+                    x: view.x,
+                    y: view.y
+                }, // Top-left
+                {
+                    x: view.x + view.width,
+                    y: view.y
+                }, // Top-right
+                {
+                    x: view.x,
+                    y: view.y + view.height
+                }, // Bottom-left
+                {
+                    x: view.x + view.width,
+                    y: view.y + view.height
+                }, // Bottom-right
+            ];
+        }
+
+        // Handle image upload
+
+        // Switch views and render respective view-specific images
+        viewTabs.forEach((tab) => {
+            tab.addEventListener("click", () => {
+                viewTabs.forEach((tab) => tab.classList.remove("active")); // Remove active from all tabs
+                tab.classList.add("active"); // Add active to clicked tab
+
+                currentView = tab.dataset.view; // Set the currentView based on data-view
+                drawCanvas(); // Redraw canvas with the new view
+            });
+        });
+        imageUpload.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const view = views[
+                            currentView]; // Use the currentView to determine where to store the image
+                        view.image = img;
+
+                        // Center image in the red box
+                        view.width = redBoxWidth * 0.5;
+                        view.height = (img.height / img.width) * view.width;
+                        view.x = redBoxX + (redBoxWidth - view.width) / 2;
+                        view.y = redBoxY + (redBoxHeight - view.height) / 2;
+
+                        drawCanvas(); // Redraw canvas after image load
+                    };
+                    img.src = event.target.result; // Load image data
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        removeBtn.addEventListener("click", () => {
+            const view = views[currentView];
+            view.image = null;
+            view.x = 0;
+            view.y = 0;
+            view.width = 0;
+            view.height = 0;
+            drawCanvas();
+        });
+        // Mouse events for dragging and resizing
+        canvas.addEventListener("mousedown", (e) => {
+            const mouseX = e.offsetX;
+            const mouseY = e.offsetY;
+            const view = views[currentView];
+            const handles = getHandles(view);
+
+            // Check if mouse is over a resize handle
+            currentHandleIndex = handles.findIndex((handle) =>
+                mouseX >= handle.x - resizeHandleSize / 2 &&
+                mouseX <= handle.x + resizeHandleSize / 2 &&
+                mouseY >= handle.y - resizeHandleSize / 2 &&
+                mouseY <= handle.y + resizeHandleSize / 2
+            );
+
+            if (currentHandleIndex !== -1) {
+                isResizing = true;
+                return;
+            }
+
+            // Check if mouse is over the image
+            if (
+                mouseX >= view.x &&
+                mouseX <= view.x + view.width &&
+                mouseY >= view.y &&
+                mouseY <= view.y + view.height
+            ) {
+                isDragging = true;
+            }
+        });
+
+        canvas.addEventListener("mousemove", (e) => {
+            const mouseX = e.offsetX;
+            const mouseY = e.offsetY;
+            const view = views[currentView];
+
+            if (isDragging) {
+                // Dragging logic
+                view.x = mouseX - view.width / 2;
+                view.y = mouseY - view.height / 2;
+
+                // Restrict dragging to the red-marked box
+                view.x = Math.max(redBoxX, Math.min(view.x, redBoxX + redBoxWidth - view.width));
+                view.y = Math.max(redBoxY, Math.min(view.y, redBoxY + redBoxHeight - view.height));
+
+                drawCanvas();
+            } else if (isResizing && currentHandleIndex !== null) {
+                // Resizing logic
+                const handles = getHandles(view);
+                const handle = handles[currentHandleIndex];
+
+                if (currentHandleIndex === 0) {
+                    // Top-left
+                    const newWidth = view.x + view.width - mouseX;
+                    const newHeight = view.y + view.height - mouseY;
+                    if (newWidth > 20 && newHeight > 20) {
+                        view.width = newWidth;
+                        view.height = newHeight;
+                        view.x = mouseX;
+                        view.y = mouseY;
+                    }
+                } else if (currentHandleIndex === 3) {
+                    // Bottom-right
+                    const newWidth = mouseX - view.x;
+                    const newHeight = mouseY - view.y;
+                    if (newWidth > 20 && newHeight > 20) {
+                        view.width = newWidth;
+                        view.height = newHeight;
+                    }
+                }
+
+                drawCanvas();
+            }
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            isDragging = false;
+            isResizing = false;
+            currentHandleIndex = null;
+        });
+
+        // Trigger file upload
+        uploadBtn.addEventListener("click", () => {
+            imageUpload.click();
+        });
+
+        // Initial canvas setup
+        drawCanvas();
     </script>
 @endsection
