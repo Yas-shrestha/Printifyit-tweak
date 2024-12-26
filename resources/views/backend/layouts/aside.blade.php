@@ -63,7 +63,7 @@
                 <li class="menu-header small text-uppercase">
                     <span class="menu-header-text">Category and reservation</span>
                 </li>
-                <li class="menu-item {{ Route::is('categories.index') ? 'active' : '' }}">
+                {{-- <li class="menu-item {{ Route::is('categories.index') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
                         <div data-i18n="Account Settings">Categories</div>
@@ -75,7 +75,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
                 <li class="menu-item {{ Route::is('file.index') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="fa fa-folder" aria-hidden="true"></i>

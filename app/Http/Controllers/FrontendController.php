@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Carousel;
 use App\Models\cart;
 use App\Models\contact;
+use App\Models\customizedProd;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,7 +35,7 @@ class FrontendController extends Controller
     public function cart()
     {
         $user_id = Auth::user()->id;
-        $carts = cart::query()->where('user_id', $user_id)->get()->all();
+        $carts = customizedProd::query()->where('user_id', $user_id)->get()->all();
         return view('frontend.cart', compact('carts'));
     }
     public function checkout()

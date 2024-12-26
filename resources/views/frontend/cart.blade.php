@@ -2,41 +2,39 @@
 
 @section('container')
     <div class="container mt-5">
-        <h1 class="text-center mb-4">Shopping Cart</h1>
+        <h1 class="text-center mb-4">Customize-Product</h1>
+        <h3 class="text-center mb-4">The Additional customization price is included here wire</h3>
         <table class="table table-bordered table-hover">
             <thead class="table-dark">
                 <tr>
                     <th>Img</th>
                     <th>Product</th>
-                    <th>Price per Item</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
+                    <th>Price </th>
                     <th>Actions</th>
                 </tr>
             </thead>
+
             <tbody id="cart-items">
                 @foreach ($carts as $cart)
+                    @php
+                        // Decode the JSON in the views field to access the front image
+                        $views = json_decode($cart->views, true);
+                        $frontImage = $views['front']['image'] ?? null; // Get the front view image, if available
+                    @endphp
                     <tr class="cart-item" id="cart-{{ $cart->id }}">
                         <td>
-                            <a href="{{ $cart->product->img }}">
-                                <img src="{{ $cart->product->img }}" alt="" height="50px" width="50px">
-                            </a>
+                            @if ($frontImage)
+                                <img src="{{ $frontImage }}" alt="Front View" height="50px" width="50px">
+                            @else
+                                <img src="{{ $cart->products->front_img }}" alt="Front View" height="50px" width="50px">
+                            @endif
                         </td>
-                        <td>{{ $cart->product->name }}</td>
-                        <td class="product-price">{{ $cart->product->price }}</td>
+                        <td>{{ $cart->products->name }}</td>
+                        <td class="product-price">{{ $cart->products->price + $cart->customization_charge }}</td>
+
                         <td>
-                            <div class="input-group">
-                                <button class="btn btn-outline-secondary minus" onclick="test(this)">-</button>
-                                <input type="number" class="form-control quantity" value="{{ $cart->quantity }}"
-                                    min="1">
-                                <button class="btn btn-outline-secondary plus" onclick="test(this)">+</button>
-                            </div>
-                        </td>
-                        <td>
-                            <input type="text" class="form-control finalPrice outline-0 border-0"
-                                value="{{ $cart->quantity * $cart->product->price }}" readonly>
-                        </td>
-                        <td>
+                            <a href="{{ route('custom.view', $cart->id) }}" class="btn btn-secondary"><i class="fa fa-eye"
+                                    aria-hidden="true"></i></a>
                             <button type="button" class="btn btn-danger" data-bs-toggle="modal"
                                 data-bs-target="#removeCart{{ $cart->id }}">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
@@ -72,9 +70,8 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <th colspan="4" class="text-end">Total:</th>
+                    <th colspan="3" class="text-end">Total:</th>
                     <th class="mainTotal">0</th>
-                    <th></th>
                 </tr>
             </tfoot>
 

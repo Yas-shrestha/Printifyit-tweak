@@ -23,7 +23,6 @@ return new class extends Migration
             $table->json('views'); // Canvas data
             $table->decimal('customization_charge', 10, 2)->default('200'); // Canvas data
             $table->string('status')->default('pending'); // Status of the customization (e.g., pending, approved, completed)
-
             $table->timestamps();
         });
     }

@@ -5,16 +5,18 @@ use App\Http\Controllers\EsewaPaymentController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CustomizedProdController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\FrontendController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Models\customizedProd;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontendController::class, 'index']);
-Route::get('/cart', [FrontendController::class, 'cart']);
+Route::get('/cart', [FrontendController::class, 'cart'])->name('cart');
 Route::get('/shop', [FrontendController::class, 'shop']);
 Route::get('/checkout', [FrontendController::class, 'checkout']);
 Route::get('/contact', [FrontendController::class, 'contact']);
@@ -23,14 +25,16 @@ Route::post('/contact-store', [FrontendController::class, 'contactStore'])->name
 Route::get('/customize-prod/{id}', [FrontendController::class, 'customizeProd'])->name('customize.prod');
 // Route::get('/prod-detail/{id}', [FrontendController::class, 'prodDetail'])->name('prod.detail');
 
-Route::post('/carts/{id}', [CartController::class, 'index'])->name('carts.store');
-Route::delete('/carts/{id}', [CartController::class, 'destroy'])->name('carts.destroy');
+// Route::post('/carts/{id}', [CartController::class, 'index'])->name('carts.store');
+Route::delete('/custom/{id}', [CustomizedProdController::class, 'destroy'])->name('custom.destroy');
 
 Route::post('esewa/pay', [EsewaPaymentController::class, 'pay'])->name('esewa.pay');
 Route::get('esewa/check', [EsewaPaymentController::class, 'check'])->name('esewa.check');
 
 Route::get('/payment-failed', [FrontendController::class, 'paymentFailed'])->name('payment-failed');
 
+Route::post('/customize-save/{id}', [CustomizedProdController::class, 'customization'])->name('custom.save')->middleware('auth');
+Route::get('/customize-view/{id}', [CustomizedProdController::class, 'viewCustomize'])->name('custom.view')->middleware('auth');
 
 
 Route::middleware('auth')->prefix('admin')->group(function () {
@@ -38,7 +42,6 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('/update-status/{id}', [ProductController::class, 'changeStatus'])->name('update.status');
     Route::post('/update-price/{id}', [ProductController::class, 'updatePrice'])->name('update.price');
     Route::resource('/product', ProductController::class);
-    Route::resource('/categories', CategoryController::class);
     Route::resource('/orders', OrdersController::class);
     Route::resource('/file', FileController::class);
     Route::get('/', DashboardController::class)->name('dashboard');
@@ -46,8 +49,6 @@ Route::middleware('auth')->prefix('admin')->group(function () {
     Route::get('/contact/{id}/show', [ContactController::class, 'show'])->name('contact.show');
     Route::delete('/contact/{id}/delete', [ContactController::class, 'destroy'])->name('contact.destroy');
     Route::resource('/carousels', CarouselController::class);
-
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

@@ -30,7 +30,7 @@
                                 @foreach ($datas as $data)
                                     <tr>
                                         <th scope="row">{{ $loop->iteration }}</th>
-                                        <td>{{ $data->product->name }}</td>
+                                        <td>{{ $data->products->name }}</td>
                                         <td>{{ $data->quantity }}</td>
                                         <td>{{ $data->product->price }}</td>
                                     </tr>

@@ -86,6 +86,13 @@
         .tab-images img.active {
             border: 2px solid #000;
         }
+
+        .color-swatch.active,
+        .size-swatch.active {
+            border: 2px solid #007bff;
+            /* Blue border to indicate selection */
+            box-shadow: 0 0 5px #007bff;
+        }
     </style>
     <div class="container my-5">
         <div class="row">
@@ -126,7 +133,6 @@
                 </div>
 
                 <!-- Hidden File Input -->
-                <input type="file" id="image-upload" class="form-control" style="display: none;" accept="image/*">
             </div>
             <!-- Right Panel -->
             <div class="col-md-3">
@@ -188,18 +194,31 @@
                         @endif
 
                     </div>
+                    <form id="product-form" method="POST" action="{{ route('custom.save', $product->id) }}">
+                        @csrf
+                        <input type="hidden" name="selected_color" id="selected-color">
+                        <input type="hidden" name="selected_size" id="selected-size">
+                        <input type="hidden" name="canvas_data" id="canvas-data">
+                        <input type="file" id="image-upload" class="form-control" style="display: none;"
+                            accept="image/*">
+                        <button type="submit" class="btn btn-primary mt-3">Save Customization</button>
+                    </form>
+                    @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                 </div>
             </div>
         </div>
     </div>
-    <form id="product-form" method="POST" action="{{ route('product.save') }}">
-        @csrf
-        <input type="hidden" name="selected_color" id="selected-color">
-        <input type="hidden" name="selected_size" id="selected-size">
-        <input type="hidden" name="canvas_data" id="canvas-data">
-        <button type="submit" class="btn btn-primary mt-3">Save Customization</button>
-    </form>
+
+
     <script>
         // Toggle preview tabs
         document.querySelectorAll('.tab-images img').forEach(tab => {
@@ -213,6 +232,80 @@
         });
         // prod-view
     </script>
+
+
+    <script>
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            // Prevent default form submission
+            e.preventDefault();
+
+            // Get selected color
+            const activeColorElement = document.querySelector('.color-swatch.active');
+            const selectedColor = activeColorElement ? activeColorElement.dataset.color : null;
+
+            // Get selected size
+            const activeSizeElement = document.querySelector('.size-swatch.active');
+            const selectedSize = activeSizeElement ? activeSizeElement.dataset.size : null;
+
+            // Gather canvas data for all views
+            const canvasData = {};
+            Object.keys(views).forEach((viewKey) => {
+                const view = views[viewKey];
+                if (view.image) {
+                    canvasData[viewKey] = {
+                        image: view.image.src, // Image source
+                        x: view.x, // X position
+                        y: view.y, // Y position
+                        width: view.width, // Width
+                        height: view.height, // Height
+                    };
+                }
+            });
+
+            // Populate hidden inputs
+            document.getElementById('selected-color').value = selectedColor;
+            document.getElementById('selected-size').value = selectedSize;
+            document.getElementById('canvas-data').value = JSON.stringify(canvasData);
+
+            // Submit the form
+            this.submit();
+        });
+    </script>
+
+    <script>
+        //highlight selected color and size
+        document.addEventListener('DOMContentLoaded', () => {
+            const colorSwatches = document.querySelectorAll('.color-swatch');
+            const sizeSwatches = document.querySelectorAll('.size-swatch');
+            const selectedColorInput = document.getElementById('selected-color');
+            const selectedSizeInput = document.getElementById('selected-size');
+
+            // Handle color selection
+            colorSwatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    // Remove 'active' class from all swatches
+                    colorSwatches.forEach(s => s.classList.remove('active'));
+                    // Add 'active' class to the selected swatch
+                    swatch.classList.add('active');
+                    // Set the value in the hidden input
+                    selectedColorInput.value = swatch.getAttribute('data-color');
+                });
+            });
+
+            // Handle size selection
+            sizeSwatches.forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    // Remove 'active' class from all swatches
+                    sizeSwatches.forEach(s => s.classList.remove('active'));
+                    // Add 'active' class to the selected swatch
+                    swatch.classList.add('active');
+                    // Set the value in the hidden input
+                    selectedSizeInput.value = swatch.getAttribute('data-size');
+                });
+            });
+        });
+    </script> -
+
     <script>
         const canvas = document.getElementById("canvas-overlay");
         const ctx = canvas.getContext("2d");
