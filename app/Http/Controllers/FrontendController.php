@@ -35,8 +35,16 @@ class FrontendController extends Controller
     public function cart()
     {
         $user_id = Auth::user()->id;
-        $carts = customizedProd::query()->where('user_id', $user_id)->get()->all();
-        return view('frontend.cart', compact('carts'));
+        $cart = cart::query()->where('user_id', $user_id)->get();
+        $totalPrice = $cart->sum(function ($cart) {
+            if ($cart->product_id) {
+                return $cart->quantity * $cart->products->price;
+            } else {
+                return $cart->quantity * $cart->customizedProducts->products->price + $cart->customizedProducts->customization_charge;
+            }
+        });
+        // dd($totalPrice);
+        return view('frontend.cart', compact('cart', 'totalPrice'));
     }
     public function checkout()
     {
@@ -69,11 +77,13 @@ class FrontendController extends Controller
         $contact->save();
         return redirect()->back()->with('success', 'Your queries have been submitted');
     }
-    public function prodDetail($id)
+    public function customProducts()
     {
-        $product = Product::query()->where('id', $id)->get()->first();
-        return view('frontend.single-product', compact('product'));
+        $id = Auth::user()->id;
+        $products = customizedProd::query()->where('user_id', $id)->paginate('8');
+        return view('frontend.custom-products', compact('products'));
     }
+
     public function paymentFailed($id)
     {
         $id = Auth::id();

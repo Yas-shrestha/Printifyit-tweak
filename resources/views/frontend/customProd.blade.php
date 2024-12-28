@@ -304,7 +304,7 @@
                 });
             });
         });
-    </script> -
+    </script>
 
     <script>
         const canvas = document.getElementById("canvas-overlay");

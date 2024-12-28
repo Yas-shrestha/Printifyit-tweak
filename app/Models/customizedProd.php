@@ -15,4 +15,8 @@ class customizedProd extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+    public function cart()
+    {
+        return $this->hasMany(cart::class, 'customProd_id', 'id');
+    }
 }

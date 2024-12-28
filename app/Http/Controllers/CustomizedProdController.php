@@ -96,17 +96,31 @@ class CustomizedProdController extends Controller
         ]);
 
         // Return success message
-        return Redirect::route('cart')->with('success', 'Customization saved successfully!');
+        return Redirect::route('custom-products')->with('success', 'Customization saved successfully!');
     }
 
 
 
     public function viewCustomize($id)
     {
-        $customs = customizedProd::query()->where('id', $id)->get()->first();
-        // dd($customs);
+        // Check if the authenticated user has a customized product
+        $user = Auth::user();
+
+        // Check if the user has a record in the customizedProd table for the given ID
+        $customs = customizedProd::query()
+            ->where('id', $id)
+            ->where('user_id', $user->id) // Assuming the customizedProd table has a user_id field to link to the user
+            ->first();
+
+        // If no record exists, redirect to the index page
+        if (!$customs) {
+            return redirect('/')->with('error', 'You do not have  customized product.');
+        }
+
+        // If record exists, proceed to view the product's data
         $canvasData = json_decode($customs->views ?? '{}', true);
-        return view('frontend.cart-view', compact('customs', 'canvasData'));
+
+        return view('frontend.customProd-view', compact('customs', 'canvasData'));
     }
     public function destroy($id)
     {

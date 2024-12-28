@@ -185,6 +185,11 @@
                                 <a href="/contact"
                                     class="nav-link {{ request()->is('contact') ? 'active' : '' }}">Contact</a>
                             </li>
+                            @if (Auth::check() && Auth::user()->customizedProducts()->exists())
+                                <a href="/custom-products"
+                                    class="nav-link {{ request()->is('custom-products') ? 'active' : '' }}">Customized
+                                    Product</a>
+                            @endif
 
                         </ul>
 

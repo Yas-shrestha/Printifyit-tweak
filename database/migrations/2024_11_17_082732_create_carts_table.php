@@ -17,8 +17,12 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('quantity');
             // Foreign key for food_id
-            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+
+            $table->unsignedBigInteger('customProd_id')->nullable();
+            $table->foreign('customProd_id')->references('id')->on('products')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

@@ -33,6 +33,24 @@
                                         <a href="{{ route('customize.prod', $product->id) }}"
                                             class="btn btn-light me-3  px-4 pt-3 pb-3 border-0 rounded-3">
                                             Customize</a>
+                                        <form action="{{ route('carts.store') }}" method="POST"
+                                            enctype="multipart/form-data" class="pb-2 my-2">
+                                            @csrf
+                                            <button type="button" class="btn btn-link px-2"
+                                                onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                            <input type="number" name="quantity" min="1" max="20"
+                                                style="width: 40px" value="1">
+                                            <button type="button" class="btn btn-link px-2"
+                                                onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                <i class="fa fa-plus"></i>
+                                            </button>
+                                            <input type="number" name="product_id" value="{{ $product->id }}" readonly
+                                                style="display: none;">
+                                            <button type="submit" class="btn btn-secondary" title="Add to cart"><i
+                                                    class="fa-solid fa-cart-shopping"></i></button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
