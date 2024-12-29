@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('price_per_item');
             $table->foreignId('product_id')->nullable();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreignId('customProd_id')->nullable();
+            $table->foreign('customProd_id')->references('id')->on('customized_prods')->onDelete('cascade');
             $table->string('total_amount');
             $table->string('esewa_status');
             $table->string('product_status')->default('Ordered');

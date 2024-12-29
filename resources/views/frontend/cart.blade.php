@@ -1,18 +1,6 @@
 @extends('layouts.frontend')
 
 @section('container')
-    <!-- Page Header Start -->
-    <div class="container">
-        <h1 class="display-3 mb-3 animated slideInDown text-white">Cart</h1>
-        <nav aria-label="breadcrumb animated slideInDown">
-            <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a class="text-body" href="#">Home</a></li>
-                <li class="breadcrumb-item text-light active" aria-current="page">Cart</li>
-            </ol>
-        </nav>
-    </div>
-    <!-- Page Header End -->
-
     @if (Session::has('message'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ Session('message') }}
@@ -22,6 +10,7 @@
 
     <div class="container py-5">
         <section class="cart">
+
             <div class="row d-flex justify-content-center align-items-center">
                 <div class="col-lg-9 col-md-12">
                     <div class="card card-registration card-registration-2 shadow-lg rounded-3">
@@ -34,6 +23,8 @@
                                             <h6 class="mb-0"><a href="#" class="text-body"><i
                                                         class="fas fa-long-arrow-alt-left me-2"></i>Back to shop</a></h6>
                                         </div>
+                                        <small>Extra <span class="text-primary">Rs 200</span> charge in customized
+                                            cloth</small>
                                         <hr class="my-4">
 
                                         @foreach ($cart as $item)
@@ -45,7 +36,7 @@
                                                 </div>
                                                 <div class="col-md-3 col-lg-3 col-xl-3">
                                                     <h5 class="text-muted">
-                                                        {{ $item->product_id ? $item->products->name : $item->customizedProducts->products->name }}
+                                                        {{ $item->product_id ? $item->products->name : $item->customizedProducts->products->name . ' (customized)' }}
                                                     </h5>
                                                 </div>
                                                 <div class="col-md-3 col-lg-3 col-xl-2 d-flex">

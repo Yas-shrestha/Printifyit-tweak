@@ -498,6 +498,7 @@
             const mouseY = e.offsetY;
             const view = views[currentView];
 
+
             if (isDragging) {
                 // Dragging logic
                 view.x = mouseX - view.width / 2;
@@ -522,6 +523,24 @@
                         view.height = newHeight;
                         view.x = mouseX;
                         view.y = mouseY;
+                    }
+                } else if (currentHandleIndex === 1) {
+                    // Top-right
+                    const newWidth = mouseX - view.x;
+                    const newHeight = view.y + view.height - mouseY;
+                    if (newWidth > 20 && newHeight > 20) {
+                        view.width = newWidth;
+                        view.height = newHeight;
+                        view.y = mouseY;
+                    }
+                } else if (currentHandleIndex === 2) {
+                    // Bottom-left
+                    const newWidth = view.x + view.width - mouseX;
+                    const newHeight = mouseY - view.y;
+                    if (newWidth > 20 && newHeight > 20) {
+                        view.width = newWidth;
+                        view.height = newHeight;
+                        view.x = mouseX;
                     }
                 } else if (currentHandleIndex === 3) {
                     // Bottom-right

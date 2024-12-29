@@ -16,27 +16,28 @@ use App\Models\customizedProd;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [FrontendController::class, 'index']);
-Route::get('/cart', [FrontendController::class, 'cart'])->name('cart');
 Route::get('/shop', [FrontendController::class, 'shop']);
 Route::get('/checkout', [FrontendController::class, 'checkout']);
 Route::get('/contact', [FrontendController::class, 'contact']);
 Route::post('/contact-store', [FrontendController::class, 'contactStore'])->name('contact.store');
-Route::get('/customize-prod/{id}', [FrontendController::class, 'customizeProd'])->name('customize.prod')->middleware('auth');
 Route::get('/custom-products', [FrontendController::class, 'customProducts'])->name('custom-products');
 
-Route::post('/carts', [CartController::class, 'index'])->name('carts.store');
-Route::delete('/custom/{id}', [CustomizedProdController::class, 'destroy'])->name('custom.destroy');
-Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::post('esewa/pay', [EsewaPaymentController::class, 'pay'])->name('esewa.pay');
 Route::get('esewa/check', [EsewaPaymentController::class, 'check'])->name('esewa.check');
 
 Route::get('/payment-failed', [FrontendController::class, 'paymentFailed'])->name('payment-failed');
-
-Route::post('/customize-save/{id}', [CustomizedProdController::class, 'customization'])->name('custom.save')->middleware('auth');
-Route::get('customize-view/{id}', [CustomizedProdController::class, 'viewCustomize'])->name('custom.view')->middleware('auth');
-
-
+// for frotend where auth is needed
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [FrontendController::class, 'cart'])->name('cart');
+    Route::get('/customize-prod/{id}', [FrontendController::class, 'customizeProd'])->name('customize.prod');
+    Route::delete('/custom/{id}', [CustomizedProdController::class, 'destroy'])->name('custom.destroy');
+    Route::post('/carts', [CartController::class, 'index'])->name('carts.store');
+    Route::delete('/cart/{id}', [CartController::class, 'destroy'])->name('cart.destroy');
+    Route::post('/customize-save/{id}', [CustomizedProdController::class, 'customization'])->name('custom.save');
+    Route::get('customize-view/{id}', [CustomizedProdController::class, 'viewCustomize'])->name('custom.view');
+});
+// for backend so added prefix admin that adds admin on all routes inside this 
 Route::middleware('auth')->prefix('admin')->group(function () {
     Route::post('/update-req-status/{id}', [ProductController::class, 'changeReqStatus'])->name('update.reqStatus');
     Route::post('/update-status/{id}', [ProductController::class, 'changeStatus'])->name('update.status');

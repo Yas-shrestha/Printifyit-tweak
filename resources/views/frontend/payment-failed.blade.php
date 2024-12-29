@@ -43,9 +43,21 @@
                                 @foreach ($datas as $data)
                                     <tr>
                                         <th scope="row">{{ $loop->iteration }}</th>
-                                        <td>{{ $data->product->name }}</td>
+                                        <td>
+                                            @if ($data->customProd_id)
+                                                {{ $data->customProduct->name }} (Customized)
+                                            @else
+                                                {{ $data->product->name }}
+                                            @endif
+                                        </td>
                                         <td>{{ $data->quantity }}</td>
-                                        <td>{{ $data->product->price }}</td>
+                                        <td>
+                                            @if ($data->customProd_id)
+                                                {{ $data->customProduct->price + $data->customProduct->customization_charge }}
+                                            @else
+                                                {{ $data->product->price }}
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

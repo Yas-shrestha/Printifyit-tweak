@@ -19,4 +19,12 @@ class customizedProd extends Model
     {
         return $this->hasMany(cart::class, 'customProd_id', 'id');
     }
+    public function orders()
+    {
+        return $this->hasMany(Orders::class, 'customProd_id', 'id');
+    }
+    public function payments()
+    {
+        return $this->hasMany(Payments::class, 'customProd_id', 'id');
+    }
 }

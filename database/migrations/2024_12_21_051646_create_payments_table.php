@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('quantity');
             $table->foreignId('product_id')->nullable();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreignId('customProd_id')->nullable();
+            $table->foreign('customProd_id')->references('id')->on('customized_prods')->onDelete('cascade');
             $table->foreignId('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
