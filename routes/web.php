@@ -20,7 +20,6 @@ Route::get('/shop', [FrontendController::class, 'shop']);
 Route::get('/checkout', [FrontendController::class, 'checkout']);
 Route::get('/contact', [FrontendController::class, 'contact']);
 Route::post('/contact-store', [FrontendController::class, 'contactStore'])->name('contact.store');
-Route::get('/custom-products', [FrontendController::class, 'customProducts'])->name('custom-products');
 
 
 Route::post('esewa/pay', [EsewaPaymentController::class, 'pay'])->name('esewa.pay');
@@ -29,6 +28,7 @@ Route::get('esewa/check', [EsewaPaymentController::class, 'check'])->name('esewa
 Route::get('/payment-failed', [FrontendController::class, 'paymentFailed'])->name('payment-failed');
 // for frotend where auth is needed
 Route::middleware('auth')->group(function () {
+    Route::get('/custom-products', [FrontendController::class, 'customProducts'])->name('custom-products');
     Route::get('/cart', [FrontendController::class, 'cart'])->name('cart');
     Route::get('/customize-prod/{id}', [FrontendController::class, 'customizeProd'])->name('customize.prod');
     Route::delete('/custom/{id}', [CustomizedProdController::class, 'destroy'])->name('custom.destroy');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\customizedProd;
 use App\Models\Orders;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,8 @@ class DashboardController extends Controller
         } else {
             $orders = Orders::query()->paginate(10);
         }
-        return view('backend.index', compact('orders'));
+        $id = Auth::user()->id;
+        $products = customizedProd::query()->where('user_id', $id)->paginate('8');
+        return view('backend.index', compact('orders', 'products'));
     }
 }
