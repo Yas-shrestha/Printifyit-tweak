@@ -147,23 +147,12 @@
                                         </div>
 
 
-                                        <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <div class="mb-3">
-                                                <label for="stock-form" class="form-label">Stock</label>
-                                                <input type="number" class="form-control" id="stock-form"
-                                                    aria-describedby="textHelp" name="stock" min="0"
-                                                    max="50000">
-                                                @error('stock')
-                                                    <small>{{ $message }}</small>
-                                                @enderror
-                                            </div>
-                                        </div>
+
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="mb-3">
                                                 <label for="exampleInputText1" class="form-label">Front Img</label>
 
-                                                <input class="form-control" type="file" id="formFile"
-                                                    name="front_img">
+                                                <input class="form-control" type="file" id="formFile" name="front_img">
 
                                                 @error('front_img')
                                                     <small>{{ $message }}</small>

@@ -39,7 +39,6 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'stock' => 'required|numeric',
             'description' => 'required|string',
             'colors' => 'required|array',
             'colors.*' => 'string',
@@ -56,7 +55,6 @@ class ProductController extends Controller
         $product->name = $request->input('name');
         $product->description = $request->input('description');
         $product->price = $request->input('price');
-        $product->stock = $request->input('stock');
         $product->color = json_encode($request->input('colors')); // Convert the array to JSON
         $product->size = json_encode($request->input('size'));   // Convert the array to JSON
 
@@ -141,7 +139,6 @@ class ProductController extends Controller
         $product->name = $request->input('name');
         $product->description = $request->input('description');
         $product->price = $request->input('price');
-        $product->stock = $request->input('stock');
         $product->color = json_encode($request->input('color')); // Convert the array to JSON
         $product->size = json_encode($request->input('size'));   // Convert the array to JSON
 

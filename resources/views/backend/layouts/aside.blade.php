@@ -4,7 +4,7 @@
         <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
             <div class="app-brand demo">
 
-                <a href="/admin/dashboard" class="app-brand-link">
+                <a href="{{ route('main') }}" class="app-brand-link">
                     <span class=" demo menu-text fw-bolder ms-2 fs-3"><span class="text-primary">Print</span>ifyIt
                 </a>
 
@@ -40,30 +40,33 @@
                         </li>
                     </ul>
                 </li>
-                <li class= "menu-item  {{ Route::is('product.index') || Route::is('product.create') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="fa-brands fa-product-hunt"></i>
-                        <div data-i18n="Account Settings">Products</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="{{ route('product.create') }}" class="menu-link">
-                                <div data-i18n="Notifications">Create</div>
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="{{ route('product.index') }}" class="menu-link">
-                                <div data-i18n="Notifications">Manage</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="menu-header small text-uppercase">
-                    <span class="menu-header-text">Category and reservation</span>
-                </li>
-                {{-- <li class="menu-item {{ Route::is('categories.index') ? 'active' : '' }}">
+                @if (Auth::check() && Auth::user()->role == 'admin')
+                    <li
+                        class= "menu-item  {{ Route::is('product.index') || Route::is('product.create') ? 'active' : '' }}">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="fa-brands fa-product-hunt"></i>
+                            <div data-i18n="Account Settings">Products</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('product.create') }}" class="menu-link">
+                                    <div data-i18n="Notifications">Create</div>
+                                </a>
+                            </li>
+                        </ul>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('product.index') }}" class="menu-link">
+                                    <div data-i18n="Notifications">Manage</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li class="menu-header small text-uppercase">
+                        <span class="menu-header-text">Category and reservation</span>
+                    </li>
+                    {{-- <li class="menu-item {{ Route::is('categories.index') ? 'active' : '' }}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
                         <div data-i18n="Account Settings">Categories</div>
@@ -76,19 +79,20 @@
                         </li>
                     </ul>
                 </li> --}}
-                <li class="menu-item {{ Route::is('file.index') ? 'active' : '' }}">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <i class="fa fa-folder" aria-hidden="true"></i>
-                        <div data-i18n="Account Settings">Files</div>
-                    </a>
-                    <ul class="menu-sub">
-                        <li class="menu-item">
-                            <a href="{{ route('file.index') }}" class="menu-link">
-                                <div data-i18n="Notifications">Manage</div>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                    <li class="menu-item {{ Route::is('file.index') ? 'active' : '' }}">
+                        <a href="javascript:void(0);" class="menu-link menu-toggle">
+                            <i class="fa fa-folder" aria-hidden="true"></i>
+                            <div data-i18n="Account Settings">Files</div>
+                        </a>
+                        <ul class="menu-sub">
+                            <li class="menu-item">
+                                <a href="{{ route('file.index') }}" class="menu-link">
+                                    <div data-i18n="Notifications">Manage</div>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
                 @if (Auth::user() && Auth::user()->role == 'admin')
                     <li class="menu-item {{ Route::is('contact.index') ? 'active' : '' }}">
                         <a href="javascript:void(0);" class="menu-link menu-toggle">

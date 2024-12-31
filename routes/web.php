@@ -15,8 +15,8 @@ use App\Http\Controllers\ProfileController;
 use App\Models\customizedProd;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [FrontendController::class, 'index']);
-Route::get('/shop', [FrontendController::class, 'shop']);
+Route::get('/', [FrontendController::class, 'index'])->name('main');
+Route::get('/shop', [FrontendController::class, 'shop'])->name('shop');
 Route::get('/orders', [FrontendController::class, 'orders']);
 Route::get('/checkout', [FrontendController::class, 'checkout']);
 Route::get('/contact', [FrontendController::class, 'contact']);

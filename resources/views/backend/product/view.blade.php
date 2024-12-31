@@ -25,7 +25,10 @@
                     <div class="mt-3">
                         <h6>Product Colors</h6>
                         <div class="d-flex gap-2">
-                            @foreach (explode(',', $product->color) as $color)
+                            @php
+                                $colors = json_decode($product->color);
+                            @endphp
+                            @foreach ($colors as $color)
                                 <div class="color-swatch"
                                     style="background: {{ $color }}; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 1px solid #ccc;"
                                     data-color="{{ $color }}">
@@ -37,7 +40,10 @@
                     <div class="mt-3">
                         <h6>Product Sizes</h6>
                         <div class="d-flex gap-2">
-                            @foreach (explode(',', $product->size) as $size)
+                            @php
+                                $sizes = json_decode($product->size);
+                            @endphp
+                            @foreach ($sizes as $size)
                                 <div class="size-swatch"
                                     style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;"
                                     data-size="{{ $size }}">
@@ -49,13 +55,10 @@
 
 
                 </div>
-                {{-- <div class="alert mt-3 alert-warning alert-dismissible fade show" role="alert">
-                    You can click on img to see it on new tab
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div> --}}
+
                 <div class="description p-3 my-3 bg-light rounded-3 product-suggestion">
                     <h3 class="my-3 text-center text-primary ">Product Description</h3>
-                    {!! $product->suggestion !!}
+                    {!! $product->description !!}
                 </div>
             </div>
         </div>

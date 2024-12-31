@@ -20,7 +20,7 @@
                                     <div class="p-5">
                                         <div class="d-flex justify-content-between align-items-center mb-5">
                                             <h1 class="fw-bold mb-0 text-black">Shopping Cart</h1>
-                                            <h6 class="mb-0"><a href="#" class="text-body"><i
+                                            <h6 class="mb-0"><a href="{{ route('shop') }}" class="text-body"><i
                                                         class="fas fa-long-arrow-alt-left me-2"></i>Back to shop</a></h6>
                                         </div>
                                         <small>Extra <span class="text-primary">Rs 200</span> charge in customized

@@ -14,8 +14,20 @@
         <div class="mt-4">
             <x-input-label style="color: black" for="email" :value="__('Email')" />
             <x-text-input id="email" class="block mt-1 w-full" style="background: white;border:none" type="email"
-                name="email" :value="old('email')" required autocomplete="username" />
+                name="email" :value="old('email')" required autocomplete="email" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+        <div class="mt-4">
+            <x-input-label style="color: black" for="phone" :value="__('Phone')" />
+            <x-text-input id="phone" class="block mt-1 w-full" style="background: white;border:none" type="tel"
+                name="phone" :value="old('phone')" required autocomplete="tel" />
+            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+        </div>
+        <div class="mt-4">
+            <x-input-label style="color: black" for="address" :value="__('Address')" />
+            <x-text-input id="address" class="block mt-1 w-full" style="background: white;border:none" type="tel"
+                name="address" :value="old('address')" required autocomplete="tel" />
+            <x-input-error :messages="$errors->get('address')" class="mt-2" />
         </div>
 
         <!-- Password -->
