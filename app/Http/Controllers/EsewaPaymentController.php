@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\cart;
 use App\Models\Orders;
 use App\Models\Payments;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Xentixar\EsewaSdk\Esewa;
@@ -60,6 +61,8 @@ class EsewaPaymentController extends Controller
                         'product_id' => $cart->product_id,
                         'customProd_id' => $cart->customProd_id, // Include custom product ID if applicable
                         'quantity' => $cart->quantity,
+                        'color' => $cart->color,
+                        'size' => $cart->size,
                         'esewa_status' => 'Paid',
                         'price_per_item' => $cart->customProd_id
                             ? $cart->customizedProducts->products->price + $cart->customizedProducts->customization_charge // Add customization charge if applicable
@@ -75,11 +78,54 @@ class EsewaPaymentController extends Controller
                             ? $cart->customizedProducts->products->price + $cart->customizedProducts->customization_charge // Add customization charge if applicable
                             : $cart->products->price,
                         'quantity' => $cart->quantity,
+                        'color' => $cart->color,
+                        'size' => $cart->size,
                         'product_id' => $cart->product_id,
                         'customProd_id' => $cart->customProd_id, // Include custom product ID if applicable
                     ]);
+                    if ($cart->customProd_id) {
+                        // Fetch the base product linked to the custom product
+                        $baseProduct = $cart->customizedProducts->products;
+                        if ($baseProduct) {
+                            // Ensure sufficient stock before deduction
+                            if ($baseProduct->stock >= $cart->quantity) {
+                                $baseProduct->stock -= $cart->quantity; // Deduct quantity from base product
+                                $baseProduct->save(); // Save updated stock
+                            } else {
+                                throw new \Exception("Insufficient stock for base product: {$baseProduct->name}");
+                            }
+                        } else {
+                            throw new \Exception("Base product for custom product not found.");
+                        }
 
-                    $cart->delete(); // Remove cart item after processing
+                        // Deduct stock from the regular product as well
+                        $regularProduct = Product::find($cart->product_id);
+                        if ($regularProduct) {
+                            if ($regularProduct->stock >= $cart->quantity) {
+                                $regularProduct->stock -= $cart->quantity; // Deduct quantity
+                                $regularProduct->save(); // Save updated stock
+                            } else {
+                                throw new \Exception("Insufficient stock for product: {$regularProduct->name}");
+                            }
+                        } else {
+                            throw new \Exception("Regular product not found for custom product.");
+                        }
+                    } else {
+                        // Handle regular products
+                        $product = Product::find($cart->product_id);
+                        if ($product) {
+                            if ($product->stock >= $cart->quantity) {
+                                $product->stock -= $cart->quantity; // Deduct quantity
+                                $product->save(); // Save updated stock
+                            } else {
+                                throw new \Exception("Insufficient stock for product: {$product->name}");
+                            }
+                        } else {
+                            throw new \Exception("Product not found.");
+                        }
+                    }
+
+                    $cart->delete();
                 }
                 $id = Auth::user()->id;
 

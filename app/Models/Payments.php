@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Payments extends Model
 {
-    protected $fillable = ['transaction_code', 'amount', 'quantity', 'product_id', 'user_id', 'customProd_id'];
+    protected $fillable = ['transaction_code', 'amount', 'quantity', 'product_id', 'user_id', 'customProd_id', 'color', 'size'];
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');

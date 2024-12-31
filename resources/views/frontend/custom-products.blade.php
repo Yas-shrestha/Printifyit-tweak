@@ -33,6 +33,8 @@
                                 <form action="{{ route('carts.store') }}" method="POST" enctype="multipart/form-data"
                                     class="pb-2 my-2">
                                     @csrf
+                                    <input type="hidden" name="color" id="color" value="{{ $product->color }}">
+                                    <input type="hidden" name="size" id="size" value="{{ $product->size }}">
                                     <button type="button" class="btn btn-link px-2"
                                         onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
                                         <i class="fa fa-minus"></i>

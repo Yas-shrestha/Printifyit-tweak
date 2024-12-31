@@ -15,6 +15,8 @@ class CartController extends Controller
             $user_id = Auth::user()->id;
             $validate_data = $request->validate([
                 'quantity' => 'required',
+                'size' => 'required',
+                'color' => 'required',
                 'product_id' => 'nullable|required_without:customProd_id', // Product ID required if customProd_id is not provided
                 'customProd_id' => 'nullable|required_without:product_id', // Custom Product ID required if product_id is not provided
             ]);
@@ -45,6 +47,8 @@ class CartController extends Controller
                 $newCartItem = new cart;
                 $newCartItem->user_id = $user_id;
                 $newCartItem->quantity = $validate_data['quantity'];
+                $newCartItem->color = $validate_data['color'];
+                $newCartItem->size = $validate_data['size'];
 
                 if (!empty($validate_data['product_id'])) {
                     $newCartItem->product_id = $validate_data['product_id'];

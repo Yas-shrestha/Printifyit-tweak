@@ -6,6 +6,7 @@ use App\Models\Carousel;
 use App\Models\cart;
 use App\Models\contact;
 use App\Models\customizedProd;
+use App\Models\Orders;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -31,6 +32,11 @@ class FrontendController extends Controller
     {
         $products = Product::query()->paginate(16);
         return view('frontend.shop', compact('products'));
+    }
+    public function orders()
+    {
+        $orders = Orders::query()->paginate(16);
+        return view('frontend.shop', compact('orders'));
     }
     public function cart()
     {

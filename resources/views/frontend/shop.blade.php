@@ -30,27 +30,123 @@
 
                                         <h3 class="secondary-font text-primary">{{ $product->price }}</h3>
 
-                                        <a href="{{ route('customize.prod', $product->id) }}"
-                                            class="btn btn-light me-3  px-4 pt-3 pb-3 border-0 rounded-3">
-                                            Customize</a>
-                                        <form action="{{ route('carts.store') }}" method="POST"
-                                            enctype="multipart/form-data" class="pb-2 my-2">
-                                            @csrf
-                                            <button type="button" class="btn btn-link px-2"
-                                                onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                                                <i class="fa fa-minus"></i>
-                                            </button>
-                                            <input type="number" name="quantity" min="1" max="20"
-                                                style="width: 40px" value="1">
-                                            <button type="button" class="btn btn-link px-2"
-                                                onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                                                <i class="fa fa-plus"></i>
-                                            </button>
-                                            <input type="number" name="product_id" value="{{ $product->id }}" readonly
-                                                style="display: none;">
-                                            <button type="submit" class="btn btn-secondary" title="Add to cart"><i
-                                                    class="fa-solid fa-cart-shopping"></i></button>
-                                        </form>
+                                        <div class="row gap-1">
+                                            <div class="col-4"> <a href="{{ route('customize.prod', $product->id) }}"
+                                                    class="btn btn-light me-3  px-4 py-3 border-0 rounded-3">
+                                                    Customize</a>
+                                            </div>
+                                            <div class="col-7">
+                                                <button type="button"
+                                                    class="btn btn-secondary me-3  px-4 py-3 border-0 rounded-3"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#exampleModal{{ $product->id }}">
+                                                    Add to cart
+                                                </button>
+                                            </div>
+                                            <!-- Button trigger modal -->
+
+
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="exampleModal{{ $product->id }}" tabindex="-1"
+                                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog        ">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                                {{ $product->name }}</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <a href="{{ asset($product->front_img) }}" target="_blank">
+                                                                <img src="{{ asset($product->front_img) }}"
+                                                                    class="img-fluid rounded-4" alt="image"
+                                                                    width="100%" height="300px" /></a>
+
+                                                            <div class="mb-3">
+                                                                <label for="color" class="form-label">Select
+                                                                    Color:</label>
+                                                                <div class="d-flex flex-wrap">
+                                                                    @php
+                                                                        $colors = json_decode($product->color, true); // Decode the JSON string into an array
+                                                                    @endphp
+                                                                    @if (is_array($colors) && count($colors) > 0)
+                                                                        <div class="d-flex flex-wrap">
+                                                                            @foreach ($colors as $color)
+                                                                                <div class="color-option me-2 mb-2"
+                                                                                    style="width: 40px; height: 40px; background-color: {{ $color }}; border: 2px solid transparent; border-radius: 4px; cursor: pointer;"
+                                                                                    onclick="selectOption(this, 'color', '{{ $color }}')">
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    @else
+                                                                        <p>No colors available.</p>
+                                                                    @endif
+                                                                </div>
+
+                                                            </div>
+
+                                                            <!-- Size Selection -->
+                                                            <div class="mb-3">
+                                                                <label for="size" class="form-label">Select
+                                                                    Size:</label>
+                                                                <div class="d-flex flex-wrap">
+                                                                    @php
+                                                                        $sizes = json_decode($product->size, true); // Decode the JSON string into an array
+                                                                    @endphp
+                                                                    @if (is_array($sizes))
+                                                                        <div class="d-flex flex-wrap">
+                                                                            @foreach ($sizes as $size)
+                                                                                <div class="size-option me-2 mb-2"
+                                                                                    style="padding: 8px 12px; background-color: #f8f9fa; border: 1px solid #ced4da; border-radius: 4px; cursor: pointer;"
+                                                                                    onclick="selectOption(this, 'size', '{{ $size }}')">
+                                                                                    {{ strtoupper($size) }}
+                                                                                </div>
+                                                                            @endforeach
+                                                                        </div>
+                                                                    @else
+                                                                        <p>No colors available.</p>
+                                                                    @endif
+                                                                </div>
+
+                                                            </div>
+
+                                                            {!! $product->description !!}
+                                                        </div>
+                                                        <div class="modal-footer">
+
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Close</button>
+
+                                                            <form action="{{ route('carts.store') }}" method="POST"
+                                                                enctype="multipart/form-data" class="pb-2 my-2">
+                                                                @csrf
+                                                                <input type="hidden" name="color" id="selected-color">
+                                                                <input type="hidden" name="size" id="selected-size">
+                                                                <button type="button" class="btn btn-link px-2"
+                                                                    onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                                    <i class="fa fa-minus"></i>
+                                                                </button>
+                                                                <input type="number" name="quantity" min="1"
+                                                                    max="20" style="width: 40px" value="1">
+                                                                <button type="button" class="btn btn-link px-2"
+                                                                    onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                                    <i class="fa fa-plus"></i>
+                                                                </button>
+                                                                <input type="number" name="product_id"
+                                                                    value="{{ $product->id }}" readonly
+                                                                    style="display: none;">
+                                                                <button type="submit" class="btn btn-secondary"
+                                                                    title="Add to cart"><i
+                                                                        class="fa-solid fa-cart-shopping"></i></button>
+                                                            </form>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -72,6 +168,26 @@
             if (input.value > input.min) {
                 input.value = parseInt(input.value) - 1;
             }
+        }
+    </script>
+
+    <script>
+        function selectOption(element, type, value) {
+            // Deselect all options of the same type
+            document.querySelectorAll(`.${type}-option`).forEach(option => {
+                option.style.border = '1px solid #ced4da'; // Reset border
+                option.style.backgroundColor = type === 'size' ? '#f8f9fa' : option.style.backgroundColor;
+            });
+
+            // Highlight the selected option
+            element.style.border = '2px solid #007bff';
+            if (type === 'size') {
+                element.style.backgroundColor = '#007bff';
+                element.style.color = '#fff';
+            }
+
+            // Set the hidden input value
+            document.getElementById(`selected-${type}`).value = value;
         }
     </script>
 @endsection

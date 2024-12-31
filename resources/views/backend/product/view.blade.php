@@ -18,23 +18,45 @@
             <h1 class="text-center text-primary ">
                 {{ $product->name }}</h1>
             <div class="text-center my-2">
-                <img src="{{ asset($product->img) }}" alt="under-production">
+                <img src="{{ asset($product->front_img) }}" alt="under-production">
             </div>
             <div>
-                <strong class="my-3"><span class="text-primary">Size :</span> {{ $product->size }}</strong> <br>
-                <strong class="my-3"><span class="text-primary">Category :</span> {{ $product->category }}</strong>
-                <div class="alert mt-3 alert-warning alert-dismissible fade show" role="alert">
+                <div class="product-details my-3">
+                    <div class="mt-3">
+                        <h6>Product Colors</h6>
+                        <div class="d-flex gap-2">
+                            @foreach (explode(',', $product->color) as $color)
+                                <div class="color-swatch"
+                                    style="background: {{ $color }}; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 1px solid #ccc;"
+                                    data-color="{{ $color }}">
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Product Sizes</h6>
+                        <div class="d-flex gap-2">
+                            @foreach (explode(',', $product->size) as $size)
+                                <div class="size-swatch"
+                                    style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;"
+                                    data-size="{{ $size }}">
+                                    {{ $size }}
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+
+                </div>
+                {{-- <div class="alert mt-3 alert-warning alert-dismissible fade show" role="alert">
                     You can click on img to see it on new tab
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                </div> --}}
                 <div class="description p-3 my-3 bg-light rounded-3 product-suggestion">
                     <h3 class="my-3 text-center text-primary ">Product Description</h3>
                     {!! $product->suggestion !!}
                 </div>
-                <div class="user-info text-center">
-                    Created by <span class="text-primary">{{ $product->user->name }}</span>
-                </div>
-
             </div>
         </div>
     </div>

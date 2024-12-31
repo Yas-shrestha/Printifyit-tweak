@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('transaction_code');
             $table->string('amount');
             $table->string('quantity');
+            $table->string('color');
+            $table->string('size');
             $table->foreignId('product_id')->nullable();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreignId('customProd_id')->nullable();

@@ -171,25 +171,20 @@
                                 <a href="/shop"
                                     class="nav-link {{ request()->is('shop') ? 'active' : '' }}">Shop</a>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" role="button" id="pages"
-                                    data-bs-toggle="dropdown" aria-expanded="false">Pages</a>
-                                <ul class="dropdown-menu" aria-labelledby="pages">
-                                    <li>
-                                        <a href="index.html" class="dropdown-item">404 page</a>
-                                    </li>
-
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a href="/contact"
-                                    class="nav-link {{ request()->is('contact') ? 'active' : '' }}">Contact</a>
-                            </li>
                             @if (Auth::check() && Auth::user()->customizedProducts()->exists())
+                                <li class="nav-item">
+                                    <a href="/orders"
+                                        class="nav-link {{ request()->is('orders') ? 'active' : '' }}">Orders</a>
+                                </li>
                                 <a href="/custom-products"
                                     class="nav-link {{ request()->is('custom-products') ? 'active' : '' }}">Customized
                                     Product</a>
                             @endif
+
+                            <li class="nav-item">
+                                <a href="/contact"
+                                    class="nav-link {{ request()->is('contact') ? 'active' : '' }}">Contact</a>
+                            </li>
 
                         </ul>
 

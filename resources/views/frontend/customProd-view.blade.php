@@ -122,21 +122,7 @@
             <!-- Right Panel -->
             <div class="col-md-3">
                 <h5 class="mb-3">{{ $customs->products->name }}</h5>
-                <form action="{{ route('carts.store') }}" method="POST" enctype="multipart/form-data" class="pb-2">
-                    @csrf
-                    <button type="button" class="btn btn-link px-2"
-                        onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
-                        <i class="fa fa-minus"></i>
-                    </button>
-                    <input type="number" name="quantity" min="1" max="20" style="width: 40px" value="1">
-                    <button type="button" class="btn btn-link px-2"
-                        onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
-                        <i class="fa fa-plus"></i>
-                    </button>
-                    <input type="number" name="customProd_id" value="{{ $customs->id }}" readonly style="display: none;">
-                    <button type="submit" class="btn btn-primary" title="Add to cart"><i
-                            class="fa-solid fa-cart-shopping"></i></button>
-                </form>
+
                 <div class="mt-3">
                     <h6>Product Color</h6>
                     <div class="d-flex gap-2">
@@ -156,7 +142,28 @@
                         </div>
                     </div>
                 </div>
-
+                <div class="my-3">
+                    <h6>Add To Cart</h6>
+                    <form action="{{ route('carts.store') }}" method="POST" enctype="multipart/form-data" class="pb-2">
+                        @csrf
+                        <input type="hidden" name="color" id="color" value="{{ $customs->color }}">
+                        <input type="hidden" name="size" id="size" value="{{ $customs->size }}">
+                        <button type="button" class="btn btn-link px-2"
+                            onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <input type="number" name="quantity" min="1" max="20" style="width: 40px"
+                            value="1">
+                        <button type="button" class="btn btn-link px-2"
+                            onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                        <input type="number" name="customProd_id" value="{{ $customs->id }}" readonly
+                            style="display: none;">
+                        <button type="submit" class="btn btn-primary" title="Add to cart"><i
+                                class="fa-solid fa-cart-shopping"></i></button>
+                    </form>
+                </div>
                 <div class="canvas-container mt-3">
                     @if (!empty($canvasData))
                         @foreach ($canvasData as $side => $data)
