@@ -1,4 +1,4 @@
-@extends('backend.layouts.main')
+@extends('layouts.frontend')
 @section('container')
     <style>
         .customization-container {
@@ -83,10 +83,12 @@
     </style>
 
     <div class="container my-5">
+
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3">
                 <div class="d-flex flex-column gap-4">
+                    <a href="{{ route('orders.index') }}" class="btn btn-primary">Back</a>
                     <button class="btn btn-light text-start" id="upload-btn">
                         <i class="fas fa-upload me-2"></i> Upload
                     </button>
