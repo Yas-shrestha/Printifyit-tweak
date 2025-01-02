@@ -19,12 +19,14 @@ class CustomizedProdController extends Controller
             'canvas_data' => 'required|string',  // Ensure canvas_data is required and is a string
             'selected_color' => 'required|string', // Ensure selected_color is a string if provided
             'selected_size' => 'required|string',  // Ensure selected_size is a string if provided
+            'name' => 'required|string',  // Ensure selected_size is a string if provided
         ]);
 
         // Extract the 'canvas_data' from the request
         $canvasData = $request->input('canvas_data');
         $selectedColor = $request->input('selected_color');
         $selectedSize = $request->input('selected_size');
+        $name = $request->input('name');
 
         // Decode the JSON data to extract the image data
         $canvasData = json_decode($canvasData, true); // Decode the JSON to an associative array
@@ -90,6 +92,7 @@ class CustomizedProdController extends Controller
             'user_id' => Auth::user()->id, // Assuming the user is logged in
             'color' => $selectedColor, // Store the selected color
             'size' => $selectedSize, // Store the selected size
+            'name' => $name, // Store the selected size
             'views' => json_encode($processedData), // Store the processed data as JSON
             'status' => 'pending', // Default status
             'customization_charge' => 200, // Default charge
@@ -111,12 +114,10 @@ class CustomizedProdController extends Controller
             ->where('id', $id)
             ->where('user_id', $user->id) // Assuming the customizedProd table has a user_id field to link to the user
             ->first();
-
         // If no record exists, redirect to the index page
         if (!$customs) {
             return redirect('/')->with('error', 'You do not have  customized product.');
         }
-
         // If record exists, proceed to view the product's data
         $canvasData = json_decode($customs->views ?? '{}', true);
 
@@ -124,9 +125,36 @@ class CustomizedProdController extends Controller
     }
     public function destroy($id)
     {
-        $custom = new customizedProd;
-        $custom = $custom->where('id', $id)->First();
-        $custom->delete();
-        return redirect('/cart')->with('success', 'Your data have been deleted');
+        // Find the CustomizedProd record by ID
+        $customizedProduct = CustomizedProd::find($id);
+
+        // Check if the record exists
+        if (!$customizedProduct) {
+            return Redirect::route('custom-products')->with('error', 'Customization not found.');
+        }
+
+        // Decode the views JSON data to access image file names
+        $views = json_decode($customizedProduct->views, true);
+
+        // Define the upload directory (where images are stored)
+        $uploadDir = public_path('uploads/canvas_images');
+
+        // Iterate through the views to delete associated images
+        foreach ($views as $section => $data) {
+            if (isset($data['image'])) {
+                $filePath = $uploadDir . '/' . $data['image'];
+
+                // Check if the file exists and delete it
+                if (File::exists($filePath)) {
+                    File::delete($filePath);
+                }
+            }
+        }
+
+        // Delete the record from the database
+        $customizedProduct->delete();
+
+        // Return success message
+        return Redirect::route('custom-products')->with('success', 'Customization deleted successfully!');
     }
 }

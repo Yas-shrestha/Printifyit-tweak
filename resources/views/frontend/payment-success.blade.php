@@ -32,7 +32,7 @@
                                         <th scope="row">{{ $loop->iteration }}</th>
                                         <td>
                                             @if ($data->customProd_id)
-                                                {{ $data->customizedProducts->products->name }} (Customized)
+                                                {{ $data->customizedProducts->name }} (Customized)
                                             @else
                                                 {{ $data->product->name }}
                                             @endif

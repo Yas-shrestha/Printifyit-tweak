@@ -90,7 +90,7 @@ class FrontendController extends Controller
         return view('frontend.custom-products', compact('products'));
     }
 
-    public function paymentFailed($id)
+    public function paymentFailed()
     {
         $id = Auth::id();
         $datas = Cart::query()->where('user_id', $id)->get();

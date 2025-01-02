@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class customizedProd extends Model
 {
-    protected $fillable = ['product_id', 'user_id', 'color', 'size', 'views', 'customization_charge',  'status'];
+    protected $fillable = ['product_id', 'user_id', 'color', 'size', 'views', 'customization_charge', 'name',  'status'];
     public function products()
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');

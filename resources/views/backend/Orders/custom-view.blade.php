@@ -1,5 +1,4 @@
-@extends('layouts.frontend')
-
+@extends('backend.layouts.main')
 @section('container')
     <style>
         .customization-container {
@@ -102,33 +101,33 @@
             <!-- Main Content -->
             <div class="col-md-6">
                 <div class="preview-box text-center position-relative">
-                    <img src="{{ asset($customs->products->front_img ?? 'https://via.placeholder.com/400x500') }}"
+                    <img src="{{ asset($order->customizedProducts->products->front_img ?? 'https://via.placeholder.com/400x500') }}"
                         alt="Product Preview" id="product-preview" class="img-fluid tshirt">
                     <canvas id="canvas-overlay"></canvas>
                 </div>
 
                 <div class="mt-3 d-flex justify-content-center gap-3 tab-images">
-                    <img src="{{ asset($customs->products->front_img ?? 'https://via.placeholder.com/60x80') }}"
+                    <img src="{{ asset($order->customizedProducts->products->front_img ?? 'https://via.placeholder.com/60x80') }}"
                         alt="Front" class="border active" data-view="front" id="front-view">
-                    <img src="{{ asset($customs->products->back_img ?? 'https://via.placeholder.com/60x80') }}"
+                    <img src="{{ asset($order->customizedProducts->products->back_img ?? 'https://via.placeholder.com/60x80') }}"
                         alt="Back" class="border" data-view="back" id="back-view">
-                    <img src="{{ asset($customs->products->right_img ?? 'https://via.placeholder.com/60x80') }}"
+                    <img src="{{ asset($order->customizedProducts->products->right_img ?? 'https://via.placeholder.com/60x80') }}"
                         alt="Right" class="border" data-view="right" id="right-view">
-                    <img src="{{ asset($customs->products->left_img ?? 'https://via.placeholder.com/60x80') }}"
+                    <img src="{{ asset($order->customizedProducts->products->left_img ?? 'https://via.placeholder.com/60x80') }}"
                         alt="Left" class="border" data-view="left" id="left-view">
                 </div>
             </div>
 
             <!-- Right Panel -->
             <div class="col-md-3">
-                <h5 class="mb-3">{{ $customs->name }}</h5>
+                <h5 class="mb-3">{{ $order->customizedProducts->products->name }}</h5>
 
                 <div class="mt-3">
                     <h6>Product Color</h6>
                     <div class="d-flex gap-2">
                         <div class="color-swatch"
-                            style="background: {{ $customs->color }}; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;"
-                            data-color="{{ $customs->color }}"></div>
+                            style="background: {{ $order->color }}; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;"
+                            data-color="{{ $order->color }}"></div>
                     </div>
                 </div>
 
@@ -137,8 +136,8 @@
                     <div class="d-flex gap-2">
                         <div class="size-swatch"
                             style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;"
-                            data-size="{{ $customs->size }}">
-                            {{ $customs->size }}
+                            data-size="{{ $order->size }}">
+                            {{ $order->size }}
                         </div>
                     </div>
                 </div>
@@ -146,8 +145,8 @@
                     <h6>Add To Cart</h6>
                     <form action="{{ route('carts.store') }}" method="POST" enctype="multipart/form-data" class="pb-2">
                         @csrf
-                        <input type="hidden" name="color" id="color" value="{{ $customs->color }}">
-                        <input type="hidden" name="size" id="size" value="{{ $customs->size }}">
+                        <input type="hidden" name="color" id="color" value="{{ $order->color }}">
+                        <input type="hidden" name="size" id="size" value="{{ $order->size }}">
                         <button type="button" class="btn btn-link px-2"
                             onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
                             <i class="fa fa-minus"></i>
@@ -158,7 +157,7 @@
                             onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
                             <i class="fa fa-plus"></i>
                         </button>
-                        <input type="number" name="customProd_id" value="{{ $customs->id }}" readonly
+                        <input type="number" name="customProd_id" value="{{ $order->id }}" readonly
                             style="display: none;">
                         <button type="submit" class="btn btn-primary" title="Add to cart"><i
                                 class="fa-solid fa-cart-shopping"></i></button>

@@ -45,7 +45,7 @@
                                     @if ($order->product)
                                         {{ $order->product->name }}
                                     @elseif ($order->customizedProducts)
-                                        {{ $order->customizedProducts->products->name }}
+                                        {{ $order->customizedProducts->name }}
                                     @else
                                         N/A
                                     @endif
@@ -95,7 +95,7 @@
                         <div class="card shadow">
                             <img src="{{ asset($product->products->front_img) }}" class="card-img-top" alt="...">
                             <div class="card-body">
-                                <h5 class="card-title">{{ $product->products->name }}</h5>
+                                <h5 class="card-title">{{ $product->name }}</h5>
                                 <h6 class="card-subtitle mb-2 text-muted ">Customization-Charge : Rs
                                     {{ $product->customization_charge }}</h6>
                                 <div class="d-flex gap-2 W-100">

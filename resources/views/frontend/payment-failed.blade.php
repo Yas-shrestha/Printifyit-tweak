@@ -45,7 +45,7 @@
                                         <th scope="row">{{ $loop->iteration }}</th>
                                         <td>
                                             @if ($data->customProd_id)
-                                                {{ $data->customProduct->name }} (Customized)
+                                                {{ $data->customizedProducts->name }} (Customized)
                                             @else
                                                 {{ $data->product->name }}
                                             @endif
@@ -53,7 +53,7 @@
                                         <td>{{ $data->quantity }}</td>
                                         <td>
                                             @if ($data->customProd_id)
-                                                {{ $data->customProduct->price + $data->customProduct->customization_charge }}
+                                                {{ $data->customizedProducts->price + $data->customizedProducts->customization_charge }}
                                             @else
                                                 {{ $data->product->price }}
                                             @endif

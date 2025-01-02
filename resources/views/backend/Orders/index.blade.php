@@ -47,35 +47,57 @@
                                             @foreach ($orders as $order)
                                                 <tr>
                                                     <th scope="row">{{ $loop->iteration }}</th>
-                                                    <td>{{ $order->product->name }}</td>
+
+                                                    {{-- Handle product or customizedProducts --}}
                                                     <td>
-                                                        <a target="_blank" href="{{ url($order->product->img) }}"><img
-                                                                src="{{ asset($order->product->img) }}" width="50px"
-                                                                height="50px" alt="no"></a>
+                                                        @if (isset($order->product))
+                                                            {{ $order->product->name }}
+                                                        @elseif (isset($order->customizedProducts))
+                                                            {{ $order->customizedProducts->name }}
+                                                        @else
+                                                            N/A
+                                                        @endif
                                                     </td>
+
+                                                    <td>
+                                                        @if (isset($order->product->front_img))
+                                                            <a target="_blank" href="{{ url($order->product->front_img) }}">
+                                                                <img src="{{ asset($order->product->front_img) }}"
+                                                                    width="50px" height="50px" alt="no">
+                                                            </a>
+                                                        @elseif (isset($order->customizedProducts->products->front_img))
+                                                            <a target="_blank"
+                                                                href="{{ url($order->customizedProducts->products->front_img) }}">
+                                                                <img src="{{ asset($order->customizedProducts->products->front_img) }}"
+                                                                    width="50px" height="50px" alt="no">
+                                                            </a>
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </td>
+
                                                     @if (Auth::user() && Auth::user()->role == 'user')
                                                         <td>
                                                             <span
                                                                 class="badge rounded-pill 
-                                                {{ $product->product_status == 'Ordered' ? 'bg-warning' : '' }}
-                                                {{ $product->product_status == 'On_Production' ? 'bg-primary' : '' }}
-                                                {{ $product->product_status == 'Finished' ? 'bg-success' : '' }}
-                                                {{ $product->product_status == 'Delivering' ? 'bg-primary' : '' }}
-                                                {{ $product->product_status == 'Delevered' ? 'bg-success' : '' }}">
-                                                                {{ $product->product_status }}
+                                                            {{ $order->product_status == 'ordered' ? 'bg-warning' : '' }}
+                                                            {{ $order->product_status == 'On_Production' ? 'bg-primary' : '' }}
+                                                            {{ $order->product_status == 'Finished' ? 'bg-success' : '' }}
+                                                            {{ $order->product_status == 'Delivering' ? 'bg-primary' : '' }}
+                                                            {{ $order->product_status == 'Delivered' ? 'bg-success' : '' }}">
+                                                                {{ $order->product_status }}
                                                             </span>
                                                         </td>
                                                     @else
                                                         <td>
                                                             <form action="{{ route('orders.update', $order->id) }}"
                                                                 method="POST">
-
                                                                 @csrf
                                                                 @method('PUT')
                                                                 <select class="form-select" name="product_status"
                                                                     aria-label="Product Status">
                                                                     <option selected disabled>Select status</option>
-                                                                    <option value="Ordered"
+                                                                    <option value="ordered"
                                                                         {{ $order->product_status == 'ordered' ? 'selected' : '' }}>
                                                                         Ordered</option>
                                                                     <option value="On_Production"
@@ -87,32 +109,32 @@
                                                                     <option value="Delivering"
                                                                         {{ $order->product_status == 'Delivering' ? 'selected' : '' }}>
                                                                         Delivering</option>
-                                                                    <option value="Delevered"
-                                                                        {{ $order->product_status == 'Delevered' ? 'selected' : '' }}>
-                                                                        Delevered</option>
+                                                                    <option value="Delivered"
+                                                                        {{ $order->product_status == 'Delivered' ? 'selected' : '' }}>
+                                                                        Delivered</option>
                                                                 </select>
                                                                 <button type="submit"
                                                                     class="btn btn-sm btn-primary my-1">Change</button>
                                                             </form>
                                                         </td>
                                                     @endif
+
                                                     <td>{{ $order->price_per_item }}</td>
-                                                    <td><span
-                                                            class="badge rounded-pill  
-                                                             {{ $order->esewa_status == 'Payed' ? 'bg-success' : '' }}
-                                                            {{ $order->esewa_status == 'Canceled' ? 'bg-danger' : '' }}
-                                                            ">
-                                                            {{ $order->esewa_status }}</span></td>
+
+                                                    <td>
+                                                        <span
+                                                            class="badge rounded-pill 
+                                                        {{ $order->esewa_status == 'Paid' ? 'bg-success' : '' }}
+                                                        {{ $order->esewa_status == 'Canceled' ? 'bg-danger' : '' }}">
+                                                            {{ $order->esewa_status }}
+                                                        </span>
+                                                    </td>
+
                                                     <td>
                                                         <a href="{{ route('orders.show', $order->id) }}"
-                                                            class="btn btn-md btn-secondary"><i class="fa fa-eye"
-                                                                aria-hidden="true"></i></a>
-                                                        <!-- Modal trigger button -->
-
-                                                        <!-- Optional: Place to the bottom of scripts -->
-                                                        <script>
-                                                            const myModal = new bootstrap.Modal(document.getElementById('modalId'), options)
-                                                        </script>
+                                                            class="btn btn-md btn-secondary">
+                                                            <i class="fa fa-eye" aria-hidden="true"></i>
+                                                        </a>
                                                     </td>
                                                 </tr>
                                             @endforeach

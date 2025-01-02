@@ -35,12 +35,10 @@ class CarouselController extends Controller
         $validate_data = $request->validate([
             'title' => 'required',
             'sub_title' => 'required',
-
             'img' => 'required'
         ]);
         $carousel->title = $validate_data['title'];
         $carousel->sub_title = $validate_data['sub_title'];
-
         $carousel->img = $validate_data['img'];
         $carousel->save();
         return redirect('admin/carousels')->with('success', 'Your data have been submitted');

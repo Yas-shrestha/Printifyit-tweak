@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\customizedProd;
 use App\Models\Orders;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -43,8 +44,30 @@ class OrdersController extends Controller
      */
     public function show($id)
     {
-        $product = Product::query()->where('id', $id)->first();
-        return view('backend.product.view', compact('product'));
+        $order = Orders::query()->find($id);
+
+        if ($order) {
+            if (!empty($order->product_id)) {
+                // If found in Orders and has a product_id, return the Order view
+                return view('backend.orders.view', compact('order'));
+            }
+        }
+
+        // If not found in Orders or has no product_id, check in CustomizedProduct
+        $order = Orders::query()
+            ->where('id', $id)
+            ->first();
+
+        if ($order) {
+            // Decode canvas data if necessary
+            $canvasData = json_decode($order->customizedProducts->views ?? '{}', true);
+
+            // If found in Order, return the Order view
+            return view('backend.orders.custom-view', compact('order', 'canvasData'));
+        }
+
+        // If neither Orders nor CustomizedProduct records exist, redirect to index
+        return redirect()->route('orders.index')->with('error', 'Order not found.');
     }
 
     /**

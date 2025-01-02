@@ -172,10 +172,6 @@
                                     class="nav-link {{ request()->is('shop') ? 'active' : '' }}">Shop</a>
                             </li>
                             @if (Auth::check() && Auth::user()->customizedProducts()->exists())
-                                <li class="nav-item">
-                                    <a href="/orders"
-                                        class="nav-link {{ request()->is('orders') ? 'active' : '' }}">Orders</a>
-                                </li>
                                 <a href="/custom-products"
                                     class="nav-link {{ request()->is('custom-products') ? 'active' : '' }}">Customized
                                     Product</a>

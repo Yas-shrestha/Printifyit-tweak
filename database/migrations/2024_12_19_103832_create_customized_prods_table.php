@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             // Customization images for different parts of the product
+            $table->string('name')->nullable();
             $table->string('color')->nullable();
             $table->string('size')->nullable();
             $table->json('views'); // Canvas data

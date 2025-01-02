@@ -312,68 +312,6 @@
         </div>
     </section>
 
-    <section id="bestselling" class="my-5 overflow-hidden">
-        <div class="container py-5 mb-5">
-            <div class="section-header d-md-flex justify-content-between align-items-center mb-3">
-                <h2 class="display-3 fw-normal">New Launches</h2>
-                <div>
-                    <a href="#" class="btn btn-outline-dark btn-lg text-uppercase fs-6 rounded-1">
-                        shop now
-
-                    </a>
-                </div>
-            </div>
-
-            {{-- <div class="swiper bestselling-swiper">
-                <div class="swiper-wrapper">
-                    @foreach ($newProducts as $product)
-                        <div class="swiper-slide">
-
-                            <div class="card position-relative">
-                                <a href="{{ route('prod.detail', $product->id) }}" target="_blank"><img
-                                        src="{{ asset($product->img) }}" class="img-fluid rounded-4"
-                                        alt="image" /></a>
-                                <div class="card-body p-0">
-                                    <a href="{{ route('prod.detail', $product->id) }}" target="_blank">
-                                        <h3 class="card-title pt-4 m-0">{{ $product->name }}</h3>
-                                    </a>
-                                    <div class="card-text">
-
-
-                                        <h3 class="secondary-font text-primary">{{ $product->price }}</h3>
-
-                                        <div class=" mt-3">
-
-                                            <form action="{{ route('carts.store', $product->id) }}" method="POST">
-                                                @csrf
-                                                <div class="my-2"
-                                                    style="display: flex; align-items: center;justify-content:center">
-                                                    <button type="button"
-                                                        onclick="decrement({{ $product->id }})">-</button>
-                                                    <input type="number" name="quantity"
-                                                        id="quantity_{{ $product->id }}" value="1" min="1"
-                                                        style="width: 50%; text-align: center;">
-                                                    <button type="button"
-                                                        onclick="increment({{ $product->id }})">+</button>
-                                                </div>
-                                                <button type="submit"
-                                                    class="btn-cart me-3 px-4 pt-3 pb-3 border-0 rounded-3">
-                                                    Add to cart
-                                                </button>
-                                            </form>
-
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-
-                </div>
-            </div> --}}
-            <!-- / category-carousel -->
-        </div>
-    </section>
 
     <script>
         function increment(index) {

@@ -136,86 +136,101 @@
             </div>
             <!-- Right Panel -->
             <div class="col-md-3">
-                <h5 class="mb-3">{{ $product->name }}</h5>
-                <p>Delivery time: {{ $product->delivery_start }} - {{ $product->delivery_end }}</p>
-                <a href="#" class="text-primary">See product details</a>
-                <div class="mt-3">
-                    <h6>Product Color</h6>
-                    <div class="d-flex gap-2">
-                        @if (!empty($product->color))
-                            @php
-                                // Decode the JSON string into an array
-                                $colors = json_decode($product->color, true);
-                            @endphp
+                <form id="product-form" method="POST" action="{{ route('custom.save', $product->id) }}">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name Your Creation</label>
+                        <input type="text" class="form-control" name="name" id="name" aria-describedby="helpId"
+                            placeholder="" />
+                    </div>
 
-                            @if (count($colors) > 0)
-                                <div class="d-flex gap-2">
-                                    @foreach ($colors as $color)
-                                        <div class="color-swatch"
-                                            style="background: {{ $color }}; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;"
-                                            data-color="{{ $color }}">
-                                        </div>
-                                    @endforeach
-                                </div>
+                    <h5 class="mb-3">{{ $product->name }}</h5>
+
+                    <a href="#" class="text-primary">See product details</a>
+                    <div class="mt-3">
+                        <h6>Product Color</h6>
+                        <div class="d-flex gap-2">
+                            @if (!empty($product->color))
+                                @php
+                                    // Decode the JSON string into an array
+                                    $colors = json_decode($product->color, true);
+                                @endphp
+
+                                @if (count($colors) > 0)
+                                    <div class="d-flex gap-2">
+                                        @foreach ($colors as $color)
+                                            <div class="color-swatch"
+                                                style="background: {{ $color }}; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;"
+                                                data-color="{{ $color }}">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p>No colors available for this product.</p>
+                                @endif
                             @else
                                 <p>No colors available for this product.</p>
                             @endif
-                        @else
-                            <p>No colors available for this product.</p>
-                        @endif
+
+                        </div>
 
                     </div>
+                    <div class="alert alert-warning alert-dismissible fade show my-3" role="alert">
+                        Please choose the color
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Product Sizes</h6>
+                        <div class="d-flex gap-2">
+                            @if (!empty($product->size))
+                                @php
+                                    // Decode the JSON string into an array for sizes
+                                    $sizes = json_decode($product->size, true);
+                                @endphp
 
-                </div>
-                <div class="mt-3">
-                    <h6>Product Sizes</h6>
-                    <div class="d-flex gap-2">
-                        @if (!empty($product->size))
-                            @php
-                                // Decode the JSON string into an array for sizes
-                                $sizes = json_decode($product->size, true);
-                            @endphp
-
-                            @if (count($sizes) > 0)
-                                <div class="d-flex gap-2">
-                                    @foreach ($sizes as $size)
-                                        <div class="size-swatch"
-                                            style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;"
-                                            data-size="{{ $size }}">
-                                            {{ $size }}
-                                        </div>
-                                    @endforeach
-                                </div>
+                                @if (count($sizes) > 0)
+                                    <div class="d-flex gap-2">
+                                        @foreach ($sizes as $size)
+                                            <div class="size-swatch"
+                                                style="padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; cursor: pointer;"
+                                                data-size="{{ $size }}">
+                                                {{ $size }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <p>No sizes available for this product.</p>
+                                @endif
                             @else
                                 <p>No sizes available for this product.</p>
                             @endif
-                        @else
-                            <p>No sizes available for this product.</p>
-                        @endif
 
-                    </div>
-                    <form id="product-form" method="POST" action="{{ route('custom.save', $product->id) }}">
-                        @csrf
-                        <input type="hidden" name="selected_color" id="selected-color">
-                        <input type="hidden" name="selected_size" id="selected-size">
-                        <input type="hidden" name="canvas_data" id="canvas-data">
-                        <input type="file" id="image-upload" class="form-control" style="display: none;"
-                            accept="image/*">
-                        <button type="submit" class="btn btn-primary mt-3">Save Customization</button>
-                    </form>
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
                         </div>
-                    @endif
+                    </div>
+                    <div class="alert alert-warning alert-dismissible fade show my-3" role="alert">
+                        Please choose the size
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
 
-                </div>
+                    @csrf
+                    <input type="hidden" name="selected_color" id="selected-color">
+                    <input type="hidden" name="selected_size" id="selected-size">
+                    <input type="hidden" name="canvas_data" id="canvas-data">
+                    <input type="file" id="image-upload" class="form-control" style="display: none;" accept="image/*">
+                    <button type="submit" class="btn btn-primary mt-3">Save Customization</button>
+                </form>
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
             </div>
         </div>
+    </div>
     </div>
 
 
