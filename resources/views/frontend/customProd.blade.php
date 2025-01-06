@@ -141,6 +141,7 @@
                         <label for="name" class="form-label">Name Your Creation</label>
                         <input type="text" class="form-control" name="name" id="name" aria-describedby="helpId"
                             placeholder="" />
+                        <small>Please Put The Unique Name for Your Creation</small>
                     </div>
 
                     <h5 class="mb-3">{{ $product->name }}</h5>

@@ -36,7 +36,7 @@
                                                 </div>
                                                 <div class="col-md-3 col-lg-3 col-xl-3">
                                                     <h5 class="text-muted">
-                                                        {{ $item->product_id ? $item->products->name : $item->customizedProducts->products->name . ' (customized)' }}
+                                                        {{ $item->product_id ? $item->products->name : $item->customizedProducts->name . ' (customized)' }}
                                                     </h5>
                                                 </div>
                                                 <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
